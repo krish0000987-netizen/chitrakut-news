@@ -19,6 +19,7 @@ import { VideosPage } from './pages/VideosPage';
 import { PhotosPage } from './pages/PhotosPage';
 import { WebStoriesPage } from './pages/WebStoriesPage';
 import { EpaperPage } from './pages/EpaperPage';
+import { EpaperReadPage } from './pages/EpaperReadPage';
 import { SubscribePage } from './pages/SubscribePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LoginPage } from './pages/LoginPage';
@@ -139,6 +140,8 @@ export default function App() {
               <Route path="/photos" element={<PhotosPage />} />
               <Route path="/web-stories" element={<WebStoriesPage />} />
               <Route path="/epaper" element={<EpaperPage />} />
+              <Route path="/epaper/read/:id" element={<EpaperReadPage />} />
+              <Route path="/epaper/read" element={<EpaperReadPage />} />
               <Route path="/subscribe" element={<SubscribePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/profile" element={<ProfilePage />} />

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { epapersService } from '../../services/epapers';
 import { Upload, Trash2, Eye, Download, Star, Newspaper, CheckCircle2 } from 'lucide-react';
 
@@ -185,23 +186,20 @@ export const EpaperManager: React.FC = () => {
                   </td>
                   <td className="p-3">
                     <div className="flex gap-1.5 justify-center">
-                      {e.pdf_public_url && (
-                        <a
-                          href={e.pdf_public_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 bg-neutral-100 hover:bg-black hover:text-white rounded-lg border border-neutral-300 text-black transition-colors"
-                          title="देखें"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </a>
-                      )}
+                      <Link
+                        to={`/epaper/read/${e.id}`}
+                        target="_blank"
+                        className="p-1.5 bg-neutral-100 hover:bg-black hover:text-white rounded-lg border border-neutral-300 text-black transition-colors"
+                        title="वेबसाइट में ई-पेपर पढ़ें"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
                       {e.pdf_public_url && (
                         <a
                           href={e.pdf_public_url}
                           download
                           className="p-1.5 bg-neutral-100 hover:bg-black hover:text-white rounded-lg border border-neutral-300 text-black transition-colors"
-                          title="डाउनलोड"
+                          title="सीधे PDF डाउनलोड करें"
                         >
                           <Download className="w-4 h-4" />
                         </a>
