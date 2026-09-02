@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Lock, User, Key, LogIn, ShieldCheck, Newspaper, ArrowRight, CheckCircle2 } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [loginType, setLoginType] = useState<'reader' | 'admin'>('reader');
   
   // Reader Form
@@ -11,10 +14,11 @@ export const LoginPage: React.FC = () => {
   const [readerPassword, setReaderPassword] = useState('reader2026');
 
   // Admin Form
-  const [adminEmail, setAdminEmail] = useState('editor@bharatpost.in');
-  const [adminPassword, setAdminPassword] = useState('editor2026');
+  const [adminEmail, setAdminEmail] = useState('admin@chitrakootjyoti.com');
+  const [adminPassword, setAdminPassword] = useState('Admin@123456');
 
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleReaderLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +30,21 @@ export const LoginPage: React.FC = () => {
     navigate('/profile');
   };
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminEmail || !adminPassword) {
       setError('Please enter valid editorial credentials');
       return;
     }
     setError('');
-    navigate('/admin');
+    setLoading(true);
+    const { error: err } = await signIn(adminEmail.trim(), adminPassword);
+    setLoading(false);
+    if (err) {
+      setError(err);
+    } else {
+      navigate('/admin');
+    }
   };
 
   return (
@@ -96,8 +107,9 @@ export const LoginPage: React.FC = () => {
               </div>
             ) : (
               <div className="font-mono text-[11px] space-y-1">
-                <p>Email: <span className="font-bold text-slate-900 dark:text-slate-100">editor@bharatpost.in</span></p>
-                <p>Password: <span className="font-bold text-slate-900 dark:text-slate-100">editor2026</span></p>
+                <p>Email: <span className="font-bold text-slate-900 dark:text-slate-100">admin@chitrakootjyoti.com</span></p>
+                <p>Password: <span className="font-bold text-slate-900 dark:text-slate-100">Admin@123456</span></p>
+                <p className="text-[10px] text-slate-500 mt-1">Or: editor@bharatpost.in / editor2026</p>
               </div>
             )}
           </div>
@@ -178,10 +190,11 @@ export const LoginPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl uppercase tracking-wider transition-colors shadow flex items-center justify-center space-x-2 text-xs"
+                disabled={loading}
+                className="w-full py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white font-bold rounded-xl uppercase tracking-wider transition-colors shadow flex items-center justify-center space-x-2 text-xs"
               >
                 <Lock className="w-4 h-4" />
-                <span>Login to Newsroom CMS</span>
+                <span>{loading ? 'Authenticating...' : 'Login to Newsroom CMS'}</span>
               </button>
             </form>
           )}
