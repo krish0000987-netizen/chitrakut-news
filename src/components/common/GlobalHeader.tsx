@@ -30,6 +30,7 @@ export const GlobalHeader: React.FC = () => {
     { name: t.nav.home, path: '/' },
     { name: t.nav.deshVidesh, path: '/desh-videsh' },
     { name: t.nav.pradesh, path: '/pradesh' },
+    { name: t.nav.bhavishya, path: '/bhavishya' },
     { name: t.nav.khel, path: '/khel' },
     { name: t.nav.dharm, path: '/dharm' },
     { name: t.nav.manoranjan, path: '/manoranjan' },
@@ -150,63 +151,175 @@ export const GlobalHeader: React.FC = () => {
             <Menu className="w-4 h-4" /> {t.header.वर्ग}
           </button>
 
-          <div className={`flex items-center gap-1 overflow-x-auto no-scrollbar py-1 flex-1 font-bold text-[13px] sm:text-sm ${language==='hi'?'font-devanagari':''}`}>
+          <div className={`flex items-center gap-1 overflow-x-auto no-scrollbar py-1.5 flex-1 font-bold text-[13px] sm:text-sm ${language==='hi'?'font-devanagari':''}`}>
             {mainCategories.map(cat => {
               const isActive = location.pathname === cat.path;
               return (
-                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${isActive ? 'bg-white text-[#8B0000]' : 'hover:bg-white/20 text-white'}`}>
+                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${isActive ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
                   {cat.name}
                 </Link>
               );
             })}
 
-            <div className="relative hidden lg:block" onMouseEnter={() => setIsBhavishyaOpen(true)} onMouseLeave={() => setIsBhavishyaOpen(false)}>
-              <button className={`px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap ${isBhavishyaOpen ? 'bg-white text-[#8B0000]' : 'hover:bg-white/20'}`}>
-                {t.nav.bhavishya} <ChevronDown className={`w-3 h-3 transition-transform ${isBhavishyaOpen ? 'rotate-180' : ''}`} />
+            {/* Bhavishya Jigyasa Dropdown in Nav */}
+            <div className="relative" onMouseEnter={() => setIsBhavishyaOpen(true)} onMouseLeave={() => setIsBhavishyaOpen(false)}>
+              <button className={`px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap text-amber-200 hover:text-white transition-colors ${isBhavishyaOpen ? 'bg-white text-[#8B0000]' : 'hover:bg-white/20'}`}>
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>{t.nav.bhavishya}</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${isBhavishyaOpen ? 'rotate-180' : ''}`} />
               </button>
               {isBhavishyaOpen && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50">
-                  <div className="bg-[#8B0000] text-white text-xs font-bold px-3 py-1.5 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-300" /> {t.nav.bhavishya}
+                <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-xl shadow-2xl border-2 border-[#8B0000] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="bg-[#8B0000] text-white text-xs font-black px-3.5 py-2 flex items-center gap-1.5 font-devanagari">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>भविष्य जिज्ञासा विशेषांक</span>
                   </div>
-                  {bhavishyaItems.map(item => (
-                    <Link key={item.path} to={item.path} className="block px-3 py-2 text-sm hover:bg-amber-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                      {item.name}
-                    </Link>
-                  ))}
+                  <div className="p-1 font-devanagari">
+                    {bhavishyaItems.map(item => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsBhavishyaOpen(false)}
+                        className="block px-3 py-2 text-xs font-bold hover:bg-amber-50 dark:hover:bg-slate-800 rounded-lg text-black dark:text-white transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          <Link to="/bhavishya/rashifal" className="hidden xl:flex items-center gap-1 bg-amber-400 text-[#8B0000] font-black text-xs px-3 py-1.5 rounded-full shrink-0 ml-2 hover:bg-amber-300">
-            <Sparkles className="w-3 h-3" /> {t.nav.rashifal}
+          <Link to="/bhavishya/rashifal" className="hidden xl:flex items-center gap-1 bg-amber-400 text-black font-black text-xs px-3.5 py-1.5 rounded-full shrink-0 ml-2 hover:bg-amber-300 shadow-sm font-devanagari">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>दैनिक राशिफल</span>
           </Link>
         </div>
 
+        {/* PROMINENT DEDICATED BHAVISHYA JIGYASA HEADER STRIP */}
+        <div className="bg-[#5a0000] dark:bg-[#3e0000] text-amber-200 border-t border-amber-500/20 px-2 sm:px-4 py-1 font-devanagari text-xs shadow-inner">
+          <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar">
+            <Link
+              to="/bhavishya"
+              className="font-black text-white flex items-center gap-1 shrink-0 bg-black/40 hover:bg-black/70 px-2.5 py-0.5 rounded-md border border-amber-400/40 transition-colors"
+              title="भविष्य जिज्ञासा"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span>भविष्य जिज्ञासा:</span>
+            </Link>
+
+            <Link
+              to="/bhavishya/bhavishyavani"
+              className={`px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                location.pathname.includes('bhavishyavani')
+                  ? 'bg-amber-400 text-black font-black shadow'
+                  : 'text-amber-100 hover:text-white hover:bg-white/15'
+              }`}
+            >
+              <span>🔮</span>
+              <span>भविष्यवाणी</span>
+            </Link>
+
+            <Link
+              to="/bhavishya/rashifal"
+              className={`px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                location.pathname.includes('rashifal')
+                  ? 'bg-amber-400 text-black font-black shadow'
+                  : 'text-amber-100 hover:text-white hover:bg-white/15'
+              }`}
+            >
+              <span>♈</span>
+              <span>दैनिक राशिफल</span>
+            </Link>
+
+            <Link
+              to="/bhavishya/panchang"
+              className={`px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                location.pathname.includes('panchang')
+                  ? 'bg-amber-400 text-black font-black shadow'
+                  : 'text-amber-100 hover:text-white hover:bg-white/15'
+              }`}
+            >
+              <span>📅</span>
+              <span>दैनिक पंचांग</span>
+            </Link>
+
+            <Link
+              to="/bhavishya/vrat-tyohar"
+              className={`px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                location.pathname.includes('vrat')
+                  ? 'bg-amber-400 text-black font-black shadow'
+                  : 'text-amber-100 hover:text-white hover:bg-white/15'
+              }`}
+            >
+              <span>🪔</span>
+              <span>व्रत-त्यौहार</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Menu */}
         {isMobileNavOpen && (
-          <div className="lg:hidden bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-t border-[#5a0000] p-3 space-y-3 max-h-[70vh] overflow-y-auto">
+          <div className="lg:hidden bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-t border-[#5a0000] p-3 space-y-3 max-h-[75vh] overflow-y-auto">
             {/* Mobile language switch */}
             <div className="flex gap-2">
               <button onClick={()=>setLanguage('hi')} className={`flex-1 py-2 rounded-full font-bold border ${language==='hi'?'bg-[#8B0000] text-white border-[#8B0000]':'bg-white border-slate-200'}`}>हिंदी</button>
               <button onClick={()=>setLanguage('en')} className={`flex-1 py-2 rounded-full font-bold border ${language==='en'?'bg-[#8B0000] text-white border-[#8B0000]':'bg-white border-slate-200'}`}>English</button>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {mainCategories.map(cat => (
-                <Link key={cat.name} to={cat.path} onClick={() => setIsMobileNavOpen(false)} className={`p-3 rounded-lg text-center font-bold border ${location.pathname === cat.path ? 'bg-[#8B0000] text-white' : 'bg-slate-50 dark:bg-slate-800 border-slate-200'} ${language==='hi'?'font-devanagari':''}`}>{cat.name}</Link>
-              ))}
-            </div>
-            <div className="bg-amber-50 dark:bg-slate-800 rounded-lg p-3 border border-amber-200">
-              <p className="font-black text-xs text-[#8B0000] mb-2 flex items-center gap-1"><Sparkles className="w-3 h-3" /> {t.nav.bhavishya}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {bhavishyaItems.map(it => (
-                  <Link key={it.path} to={it.path} onClick={() => setIsMobileNavOpen(false)} className="bg-white dark:bg-slate-700 border rounded-lg p-2 text-center text-xs font-bold">{it.name}</Link>
-                ))}
+
+            {/* Bhavishya Jigyasa Options on Mobile */}
+            <div className="bg-amber-50 dark:bg-slate-800 rounded-xl p-3 border-2 border-amber-300 dark:border-amber-700">
+              <p className="font-black text-xs text-[#8B0000] dark:text-amber-400 mb-2.5 flex items-center gap-1.5 font-devanagari uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span>भविष्य जिज्ञासा</span>
+              </p>
+              <div className="grid grid-cols-2 gap-2 font-devanagari">
+                <Link
+                  to="/bhavishya/bhavishyavani"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="bg-white dark:bg-slate-700 border border-amber-200 dark:border-slate-600 rounded-lg p-2.5 text-center text-xs font-black shadow-xs hover:bg-amber-100 flex items-center justify-center gap-1 text-black dark:text-white"
+                >
+                  <span>🔮</span>
+                  <span>भविष्यवाणी</span>
+                </Link>
+                <Link
+                  to="/bhavishya/rashifal"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="bg-white dark:bg-slate-700 border border-amber-200 dark:border-slate-600 rounded-lg p-2.5 text-center text-xs font-black shadow-xs hover:bg-amber-100 flex items-center justify-center gap-1 text-black dark:text-white"
+                >
+                  <span>♈</span>
+                  <span>दैनिक राशिफल</span>
+                </Link>
+                <Link
+                  to="/bhavishya/panchang"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="bg-white dark:bg-slate-700 border border-amber-200 dark:border-slate-600 rounded-lg p-2.5 text-center text-xs font-black shadow-xs hover:bg-amber-100 flex items-center justify-center gap-1 text-black dark:text-white"
+                >
+                  <span>📅</span>
+                  <span>दैनिक पंचांग</span>
+                </Link>
+                <Link
+                  to="/bhavishya/vrat-tyohar"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="bg-white dark:bg-slate-700 border border-amber-200 dark:border-slate-600 rounded-lg p-2.5 text-center text-xs font-black shadow-xs hover:bg-amber-100 flex items-center justify-center gap-1 text-black dark:text-white"
+                >
+                  <span>🪔</span>
+                  <span>व्रत-त्यौहार</span>
+                </Link>
               </div>
             </div>
+
+            {/* Main Categories Grid */}
+            <div className="grid grid-cols-2 gap-2">
+              {mainCategories.map(cat => (
+                <Link key={cat.name} to={cat.path} onClick={() => setIsMobileNavOpen(false)} className={`p-2.5 rounded-lg text-center font-bold border ${location.pathname === cat.path ? 'bg-[#8B0000] text-white' : 'bg-slate-50 dark:bg-slate-800 border-slate-200'} ${language==='hi'?'font-devanagari':''}`}>{cat.name}</Link>
+              ))}
+            </div>
+
             <div className="flex gap-2">
-              <Link to="/epaper" onClick={() => setIsMobileNavOpen(false)} className="flex-1 bg-[#8B0000] text-white p-3 rounded-lg text-center font-bold text-sm">📰 {t.nav.epaper}</Link>
-              <Link to="/contact" onClick={() => setIsMobileNavOpen(false)} className="flex-1 bg-slate-900 text-white p-3 rounded-lg text-center font-bold text-sm">{t.header.contact}</Link>
+              <Link to="/epaper" onClick={() => setIsMobileNavOpen(false)} className="flex-1 bg-[#8B0000] text-white p-2.5 rounded-lg text-center font-bold text-sm font-devanagari">📰 {t.nav.epaper}</Link>
+              <Link to="/contact" onClick={() => setIsMobileNavOpen(false)} className="flex-1 bg-slate-900 text-white p-2.5 rounded-lg text-center font-bold text-sm">{t.header.contact}</Link>
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 
 const rashifal = [
   { rashi: 'मेष', icon: '♈', desc: 'आज कार्य में सफलता, धन लाभ के योग। परिवार में खुशी।', color: 'bg-red-50 border-red-200' },
@@ -30,7 +30,20 @@ const panchangData = {
 
 export const BhavishyaPage: React.FC = () => {
   const { tab } = useParams<{ tab: string }>();
-  const active = (tab || 'rashifal').toLowerCase();
+  const location = useLocation();
+  const path = location.pathname.toLowerCase();
+  let active = 'rashifal';
+  if (tab) {
+    active = tab.toLowerCase();
+  } else if (path.includes('bhavishyavani')) {
+    active = 'bhavishyavani';
+  } else if (path.includes('panchang')) {
+    active = 'panchang';
+  } else if (path.includes('vrat')) {
+    active = 'vrat-tyohar';
+  } else if (path.includes('rashifal')) {
+    active = 'rashifal';
+  }
 
   const tabs = [
     { id: 'bhavishyavani', label: 'भविष्यवाणी', short: 'भविष्यवाणी' },

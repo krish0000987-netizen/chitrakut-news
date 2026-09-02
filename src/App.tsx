@@ -126,9 +126,12 @@ export default function App() {
               <Route path="/health" element={<CategoryPage defaultCategory="लाइफस्टाइल & हेल्थ" />} />
               <Route path="/automobile" element={<CategoryPage defaultCategory="टेक" />} />
               <Route path="/travel" element={<CategoryPage defaultCategory="प्रदेश" />} />
+              <Route path="/bhavishya" element={<BhavishyaPage />} />
               <Route path="/bhavishya/:tab" element={<BhavishyaPage />} />
+              <Route path="/bhavishyavani" element={<BhavishyaPage />} />
               <Route path="/rashifal" element={<BhavishyaPage />} />
               <Route path="/panchang" element={<BhavishyaPage />} />
+              <Route path="/vrat-tyohar" element={<BhavishyaPage />} />
               <Route path="/category/:categorySlug" element={<CategoryPage />} />
               <Route path="/c/:categorySlug" element={<CategoryPage />} />
               <Route path="/search" element={<CategoryPage />} />
