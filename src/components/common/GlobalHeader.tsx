@@ -86,35 +86,35 @@ export const GlobalHeader: React.FC = () => {
         </div>
       </div>
 
-      {/* BRAND AREA */}
-      <div className="py-2 sm:py-3 px-3 sm:px-4 border-b border-slate-200 dark:border-slate-800 bg-[#FEFCF8] dark:bg-[#0B0F17]">
+      {/* BRAND AREA - Big Clean Masthead Logo */}
+      <div className="py-2.5 sm:py-3.5 px-3 sm:px-6 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0B0F17]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-          <button onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} className="lg:hidden p-2 -ml-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+          <button onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} className="lg:hidden p-2 -ml-2 rounded-xl bg-neutral-100 dark:bg-slate-800 text-black dark:text-white shrink-0">
             {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <img src="/assets/logo.jpg" alt="logo" className="h-10 sm:h-14 md:h-16 w-auto object-contain rounded shadow-sm border border-slate-200" />
-            <div className="hidden sm:block text-left">
-              <h1 className="font-devanagari font-black text-xl sm:text-2xl md:text-3xl leading-none text-[#8B0000] dark:text-red-400 tracking-tight">
-                {language==='en' ? 'Chitrakoot Jyoti' : 'चित्रकूट ज्योति'}
-              </h1>
-              <p className="text-[9px] sm:text-[10px] font-bold tracking-[0.2em] text-slate-600 dark:text-slate-400 uppercase">{language==='en' ? 'Daily • Bhopal • Madhya Pradesh' : 'दैनिक • भोपाल • मध्यप्रदेश'}</p>
-              <p className="text-[8px] text-slate-500 hidden md:block">{language==='en' ? 'EST. 2026 • RNI Approved' : 'स्थापना • 2026 • RNI स्वीकृत'}</p>
-            </div>
+          {/* Big Master Logo - No redundant text beside it */}
+          <Link to="/" className="flex items-center shrink-0 group">
+            <img
+              src="/assets/logo.jpg"
+              alt="चित्रकूट ज्योति"
+              className="h-14 sm:h-20 md:h-24 lg:h-28 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            />
           </Link>
 
-          <div className="sm:hidden text-center flex-1 min-w-0">
-            <h1 className="font-devanagari font-black text-[18px] leading-none text-[#8B0000]">{language==='en' ? 'Chitrakoot Jyoti' : 'चित्रकूट ज्योति'}</h1>
-            <p className="text-[8px] font-bold tracking-widest text-slate-500 uppercase">{language==='en' ? 'Bhopal • MP' : 'भोपाल • मप्र'}</p>
-          </div>
-
+          {/* Center Tagline & Establishment 2020 */}
           <div className="hidden lg:block text-center flex-1 px-4">
-            <p className="font-devanagari text-[11px] text-slate-600 dark:text-slate-400 italic leading-tight">
+            <p className="font-devanagari text-[11px] text-neutral-600 dark:text-neutral-400 italic leading-tight">
               {language==='en' ? '"Ideological, positive, national, crime, spiritual, astrology & lifestyle news"' : '“वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध खबरें”'}
             </p>
-            <div className="flex items-center justify-center gap-2 mt-1 text-[10px] font-bold text-[#8B0000] dark:text-red-400 uppercase tracking-widest">
-              <span>EST. 2026</span><span>•</span><span>{language==='en'?'Bhopal':'भोपाल'}</span><span>•</span><span>Chitrakoot</span><span>•</span><span>MP</span>
+            <div className="flex items-center justify-center gap-2 mt-1.5 text-[11px] font-bold text-[#8B0000] dark:text-red-400 uppercase tracking-widest font-mono">
+              <span className="bg-neutral-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-neutral-300 dark:border-slate-700">
+                {language==='en' ? 'EST. 2020' : 'स्थापना : 2020'}
+              </span>
+              <span>•</span>
+              <span>RNI/MPHIN/2020/79309</span>
+              <span>•</span>
+              <span>{language==='en' ? 'Bhopal • Chitrakoot' : 'भोपाल • चित्रकूट'}</span>
             </div>
           </div>
 

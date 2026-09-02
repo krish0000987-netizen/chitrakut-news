@@ -50,12 +50,8 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
     <div className="min-h-screen bg-[#F4F4F5] text-[#111827] flex font-sans selection:bg-black selection:text-white">
       {/* Sidebar - Solid High Contrast Black */}
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-black text-white flex flex-col border-r border-neutral-800 transition-transform lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
-        <div className="p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-950">
-          <img src="/assets/logo.jpg" alt="logo" className="h-9 w-auto rounded bg-white p-0.5" />
-          <div className="flex-1 min-w-0">
-            <h1 className="font-black text-sm leading-tight text-white font-devanagari">चित्रकूट ज्योति</h1>
-            <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">न्यूज़रूम CMS</p>
-          </div>
+        <div className="p-3.5 border-b border-neutral-800 flex items-center justify-between gap-2 bg-neutral-950">
+          <img src="/assets/logo.jpg" alt="चित्रकूट ज्योति" className="h-11 w-auto rounded-lg bg-white p-1 shadow" />
           <button onClick={()=>setMobileOpen(false)} className="lg:hidden p-1.5 hover:bg-neutral-800 text-white rounded-lg"><X className="w-5 h-5" /></button>
         </div>
 

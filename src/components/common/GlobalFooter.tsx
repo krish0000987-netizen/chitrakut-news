@@ -14,11 +14,7 @@ export const GlobalFooter: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-6 pb-6 border-b border-white/10">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <img src="/assets/logo.jpg" alt="logo" className="h-10 sm:h-12 w-auto rounded border border-white/20 bg-white" />
-              <div>
-                <h2 className={`font-black text-2xl sm:text-3xl text-white leading-none ${isEn?'':'font-devanagari'}`}>{isEn?'Chitrakoot Jyoti':'चित्रकूट ज्योति'}</h2>
-                <p className="text-xs text-amber-300 font-bold tracking-widest uppercase">{isEn?'Daily • Bhopal • Madhya Pradesh':'दैनिक • भोपाल • मध्यप्रदेश'}</p>
-              </div>
+              <img src="/assets/logo.jpg" alt="चित्रकूट ज्योति" className="h-14 sm:h-16 w-auto rounded-xl p-1 bg-white shadow" />
             </div>
             <p className={`text-sm text-slate-300 mt-3 leading-relaxed max-w-2xl ${isEn?'':'font-devanagari'}`}>
               {t.footer.tagline}
@@ -97,7 +93,7 @@ export const GlobalFooter: React.FC = () => {
 
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <p className={`flex items-center gap-1 ${isEn?'':'font-devanagari'}`}>© 2026 {isEn?'Chitrakoot Jyoti':'दैनिक चित्रकूट ज्योति'} • {isEn?'All rights reserved':'सर्वाधिकार सुरक्षित'} • <Heart className="w-3 h-3 text-red-500 inline" /> {isEn?'Published from Bhopal':'भोपाल से प्रकाशित'}</p>
-          <p className="text-[10px] text-slate-500 text-center">RNI No. • Bhopal • Design: Chitrakoot Jyoti Digital Desk</p>
+          <p className="text-[10px] text-slate-400 text-center font-mono">स्थापना : 2020 • RNI/MPHIN/2020/79309 • Bhopal (M.P.)</p>
         </div>
       </div>
     </footer>
