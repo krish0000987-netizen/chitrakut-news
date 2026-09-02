@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { epapersService } from '../../services/epapers';
-import { Upload, Trash2, Eye, Download, Star } from 'lucide-react';
+import { Upload, Trash2, Eye, Download, Star, Newspaper, CheckCircle2 } from 'lucide-react';
 
 export const EpaperManager: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState('Chitrakoot Jyoti – Daily Edition');
+  const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक मुख्य संस्करण');
   const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0,10));
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -16,7 +16,7 @@ export const EpaperManager: React.FC = () => {
   useEffect(()=>{ fetch(); },[]);
 
   const onCreate = async ()=>{
-    if(!pdfFile) return alert('Select PDF');
+    if(!pdfFile) return alert('कृपया ई-पेपर की PDF फाइल चुनें');
     setUploading(true);
     try{
       const up = await epapersService.uploadPdf(pdfFile, coverFile || undefined);
@@ -25,7 +25,7 @@ export const EpaperManager: React.FC = () => {
         cover_image_path: up.coverPath, cover_public_url: up.coverUrl, file_size: up.fileSize, status:'published', is_featured:isFeatured, language:'hi', published_at: new Date().toISOString()
       } as any);
       setPdfFile(null); setCoverFile(null);
-      alert('E-Paper published ✓');
+      alert('ई-पेपर सफलतापूर्वक प्रकाशित हो गया है ✓');
       fetch();
     } catch(e:any){ alert(e.message); }
     setUploading(false);
@@ -35,52 +35,184 @@ export const EpaperManager: React.FC = () => {
     await epapersService.update(id, { is_featured: !cur } as any);
     fetch();
   };
-  const remove = async (id:string)=>{ if(!confirm('Delete e-paper?')) return; await epapersService.remove(id); fetch(); };
+  const remove = async (id:string)=>{ if(!confirm('क्या आप वाकई इस ई-पेपर को हटाना चाहते हैं?')) return; await epapersService.remove(id); fetch(); };
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border p-5">
-        <h3 className="font-black text-sm mb-3">Upload New E-Paper (PDF + Cover)</h3>
+      {/* Upload Form - Solid Black & White */}
+      <div className="bg-white rounded-2xl border-2 border-black p-5 shadow-sm">
+        <h3 className="font-black text-base text-black mb-3 pb-2 border-b border-neutral-200 flex items-center gap-2 font-devanagari">
+          <Newspaper className="w-5 h-5 text-black" /> नया ई-पेपर संस्करण अपलोड एवं प्रकाशित करें
+        </h3>
+        
         <div className="grid md:grid-cols-3 gap-3">
-          <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Edition Title" className="px-3 py-2 rounded-xl border bg-slate-50" />
-          <input type="date" value={editionDate} onChange={e=>setEditionDate(e.target.value)} className="px-3 py-2 rounded-xl border bg-slate-50" />
-          <label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={isFeatured} onChange={e=>setIsFeatured(e.target.checked)} /> Featured (homepage)</label>
-        </div>
-        <div className="grid md:grid-cols-2 gap-3 mt-3">
           <div>
-            <label className="block text-xs font-bold mb-1">PDF File * (drag & drop)</label>
-            <input type="file" accept="application/pdf" onChange={e=>setPdfFile(e.target.files?.[0]||null)} className="w-full text-xs border rounded-xl p-2 bg-slate-50" />
-            {pdfFile && <p className="text-[11px] text-emerald-600 mt-1">{pdfFile.name} • {(pdfFile.size/1024/1024).toFixed(2)} MB</p>}
+            <label className="block text-xs font-bold text-black mb-1 font-devanagari">संस्करण का नाम / शीर्षक *</label>
+            <input
+              value={title}
+              onChange={e=>setTitle(e.target.value)}
+              placeholder="उदा. चित्रकूट ज्योति - भोपाल मुख्य संस्करण"
+              className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none"
+            />
           </div>
           <div>
-            <label className="block text-xs font-bold mb-1">Cover Image (optional)</label>
-            <input type="file" accept="image/*" onChange={e=>setCoverFile(e.target.files?.[0]||null)} className="w-full text-xs border rounded-xl p-2 bg-slate-50" />
+            <label className="block text-xs font-bold text-black mb-1 font-devanagari">अखबार की तारीख (Date) *</label>
+            <input
+              type="date"
+              value={editionDate}
+              onChange={e=>setEditionDate(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none"
+            />
+          </div>
+          <div className="flex items-end pb-2">
+            <label className="flex items-center gap-2 text-xs font-bold text-black cursor-pointer font-devanagari">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={e=>setIsFeatured(e.target.checked)}
+                className="w-4 h-4 rounded border-2 border-black accent-black cursor-pointer"
+              />
+              <span>होमपेज पर मुख्य ई-पेपर बनाएं (Featured)</span>
+            </label>
           </div>
         </div>
-        <button onClick={onCreate} disabled={uploading || !pdfFile} className="mt-3 px-6 py-2.5 bg-[#8B0000] text-white rounded-xl text-xs font-black disabled:opacity-50 flex items-center gap-1">
-          <Upload className="w-4 h-4" /> {uploading ? 'Uploading...' : 'Upload & Publish PDF'}
-        </button>
-        <p className="text-[11px] text-slate-500 mt-2">Stored in Supabase Storage bucket <span className="font-mono">epapers/</span> — public URL saved in DB. Max 50MB, PDF only.</p>
+
+        <div className="grid md:grid-cols-2 gap-3 mt-4">
+          <div className="p-3 bg-neutral-50 rounded-xl border-2 border-dashed border-black">
+            <label className="block text-xs font-black text-black mb-1 font-devanagari">
+              ई-पेपर PDF फाइल चुनें * (अनिवार्य)
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={e=>setPdfFile(e.target.files?.[0]||null)}
+              className="w-full text-xs text-black border border-neutral-300 rounded-lg p-2 bg-white cursor-pointer"
+            />
+            {pdfFile && (
+              <p className="text-[11px] font-bold text-black mt-1.5 flex items-center gap-1 font-mono">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> {pdfFile.name} ({(pdfFile.size/1024/1024).toFixed(2)} MB)
+              </p>
+            )}
+          </div>
+
+          <div className="p-3 bg-neutral-50 rounded-xl border-2 border-dashed border-neutral-300">
+            <label className="block text-xs font-black text-black mb-1 font-devanagari">
+              कवर पेज फोटो (वैकल्पिक / Optional Image)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e=>setCoverFile(e.target.files?.[0]||null)}
+              className="w-full text-xs text-black border border-neutral-300 rounded-lg p-2 bg-white cursor-pointer"
+            />
+            {coverFile && (
+              <p className="text-[11px] font-bold text-black mt-1.5 flex items-center gap-1 font-mono">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> {coverFile.name}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
+          <button
+            onClick={onCreate}
+            disabled={uploading || !pdfFile}
+            className="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white rounded-xl text-xs font-black disabled:opacity-40 flex items-center gap-1.5 shadow transition-colors font-devanagari"
+          >
+            <Upload className="w-4 h-4" /> {uploading ? 'अपलोड किया जा रहा है...' : 'ई-पेपर अपलोड एवं प्रकाशित करें'}
+          </button>
+          <span className="text-[11px] text-neutral-600 font-medium">
+            प्रकाशन के तुरंत बाद पाठक <span className="font-mono text-black font-bold">/epaper</span> पर पढ़ सकेंगे।
+          </span>
+        </div>
       </div>
 
-      {loading ? <div className="h-32 bg-white rounded-xl border animate-pulse" />
-      : list.length===0 ? <div className="bg-white rounded-2xl border p-12 text-center"><p className="font-black">No e-papers</p><p className="text-xs text-slate-500">Upload today’s PDF to appear on /epaper</p></div>
-      : <div className="bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden">
+      {/* Published E-Papers Table */}
+      {loading ? (
+        <div className="h-32 bg-white rounded-2xl border-2 border-black animate-pulse" />
+      ) : list.length === 0 ? (
+        <div className="bg-white rounded-2xl border-2 border-black p-12 text-center shadow-sm">
+          <Newspaper className="w-10 h-10 text-neutral-400 mx-auto mb-2" />
+          <p className="font-black text-black font-devanagari text-base">अभी कोई ई-पेपर प्रकाशित नहीं है</p>
+          <p className="text-xs text-neutral-600 font-devanagari mt-1">ऊपर दिए गए फॉर्म से आज का ई-पेपर पीडीएफ अपलोड करें।</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border-2 border-black overflow-hidden shadow-sm">
+          <div className="p-3.5 bg-black text-white font-black text-xs uppercase tracking-wider flex items-center justify-between font-devanagari">
+            <span>प्रकाशित ई-पेपर सूची ({list.length})</span>
+            <span className="text-[11px] text-neutral-300 font-normal">Chitrakoot Jyoti Editions</span>
+          </div>
+
           <table className="w-full text-xs">
-            <thead className="bg-slate-50 text-[11px] uppercase font-black"><tr><th className="p-3 text-left">Cover</th><th className="p-3 text-left">Edition</th><th className="p-3">Date</th><th className="p-3">Status</th><th className="p-3">Featured</th><th className="p-3">Actions</th></tr></thead>
-            <tbody>
-              {list.map(e=>(
-                <tr key={e.id} className="border-t">
-                  <td className="p-3"><img src={e.cover_public_url || 'https://placehold.co/60x80'} alt="" className="w-12 h-16 object-cover rounded border" /></td>
-                  <td className="p-3"><p className="font-bold line-clamp-1">{e.title}</p><p className="text-[11px] text-slate-500 font-mono">{e.pdf_storage_path?.slice(0,30)}...</p></td>
-                  <td className="p-3 text-center">{e.edition_date}</td>
-                  <td className="p-3 text-center"><span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase ${e.status==='published'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}`}>{e.status}</span></td>
-                  <td className="p-3 text-center"><button onClick={()=>toggleFeatured(e.id, e.is_featured)} className={`p-1 rounded ${e.is_featured?'bg-amber-400 text-black':'bg-slate-100'}`}><Star className="w-4 h-4" /></button></td>
+            <thead className="bg-neutral-100 text-[11px] uppercase font-black text-black border-b-2 border-black">
+              <tr>
+                <th className="p-3 text-left font-devanagari">कवर फोटो</th>
+                <th className="p-3 text-left font-devanagari">संस्करण एवं विवरण</th>
+                <th className="p-3 text-center font-devanagari">तारीख</th>
+                <th className="p-3 text-center font-devanagari">स्थिति</th>
+                <th className="p-3 text-center font-devanagari">मुख्य (Featured)</th>
+                <th className="p-3 text-center font-devanagari">कार्य (Actions)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-200">
+              {list.map(e => (
+                <tr key={e.id} className="hover:bg-neutral-50 transition-colors">
                   <td className="p-3">
-                    <div className="flex gap-1 justify-center">
-                      {e.pdf_public_url && <a href={e.pdf_public_url} target="_blank" className="p-1.5 hover:bg-slate-100 rounded"><Eye className="w-3.5 h-3.5" /></a>}
-                      {e.pdf_public_url && <a href={e.pdf_public_url} download className="p-1.5 hover:bg-slate-100 rounded"><Download className="w-3.5 h-3.5" /></a>}
-                      <button onClick={()=>remove(e.id)} className="p-1.5 hover:bg-red-50 text-red-600 rounded"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <img
+                      src={e.cover_public_url || '/assets/logo.jpg'}
+                      alt=""
+                      className="w-12 h-16 object-cover rounded border-2 border-black shadow-xs bg-white"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <p className="font-bold text-sm text-black line-clamp-1 font-devanagari">{e.title}</p>
+                    <p className="text-[11px] text-neutral-600 font-mono mt-0.5">{e.pdf_storage_path?.slice(0, 35)}...</p>
+                  </td>
+                  <td className="p-3 text-center font-bold text-black font-mono">{e.edition_date}</td>
+                  <td className="p-3 text-center">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black border border-black bg-black text-white uppercase">
+                      {e.status === 'published' ? 'प्रकाशित' : e.status}
+                    </span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <button
+                      onClick={() => toggleFeatured(e.id, e.is_featured)}
+                      className={`p-1.5 rounded-lg border border-black ${e.is_featured ? 'bg-black text-amber-400' : 'bg-white text-neutral-400'}`}
+                      title="मुख्य संस्करण बदलें"
+                    >
+                      <Star className="w-4 h-4 fill-current" />
+                    </button>
+                  </td>
+                  <td className="p-3">
+                    <div className="flex gap-1.5 justify-center">
+                      {e.pdf_public_url && (
+                        <a
+                          href={e.pdf_public_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 bg-neutral-100 hover:bg-black hover:text-white rounded-lg border border-neutral-300 text-black transition-colors"
+                          title="देखें"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </a>
+                      )}
+                      {e.pdf_public_url && (
+                        <a
+                          href={e.pdf_public_url}
+                          download
+                          className="p-1.5 bg-neutral-100 hover:bg-black hover:text-white rounded-lg border border-neutral-300 text-black transition-colors"
+                          title="डाउनलोड"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => remove(e.id)}
+                        className="p-1.5 bg-white hover:bg-red-600 hover:text-white rounded-lg border border-red-300 text-red-600 transition-colors"
+                        title="हटाएं"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -88,7 +220,7 @@ export const EpaperManager: React.FC = () => {
             </tbody>
           </table>
         </div>
-      }
+      )}
     </div>
   );
 };
