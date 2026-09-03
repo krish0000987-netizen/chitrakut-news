@@ -175,11 +175,20 @@ async function trySupabase<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await fn();
   } catch (e: any) {
-    const m = e?.message || '';
-    if (m.includes('Could not find the table') || m.includes('Failed to fetch') || m.includes('placeholder')) {
+    const m = e?.message || e?.details || e?.hint || JSON.stringify(e || '');
+    if (
+      m.includes('Could not find') ||
+      m.includes('schema cache') ||
+      m.includes('column') ||
+      m.includes('table') ||
+      m.includes('Failed to fetch') ||
+      m.includes('placeholder')
+    ) {
+      console.warn('Supabase fallback triggered:', m);
       return fallback;
     }
-    throw e;
+    console.warn('Supabase error, returning fallback:', e);
+    return fallback;
   }
 }
 
@@ -189,17 +198,21 @@ export const epapersService = {
       let q = supabase.from('epapers').select('*').order('edition_date', { ascending: false });
       if (params?.status) q = q.eq('status', params.status);
       if (params?.featured !== undefined) q = q.eq('is_featured', params.featured);
-      if (params?.city && params.city !== 'all') q = q.eq('city_edition', params.city);
       if (params?.date) q = q.eq('edition_date', params.date);
       if (params?.limit) q = q.limit(params.limit);
       const { data, error } = await q;
       if (error) throw error;
-      return (data && data.length > 0) ? (data as DbEpaper[]) : getLocal();
+      
+      let res = (data && data.length > 0) ? (data as DbEpaper[]) : getLocal();
+      if (params?.city && params.city !== 'all') {
+        res = res.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && !x.city_edition));
+      }
+      return res;
     }, (() => {
       let d = getLocal();
       if (params?.status) d = d.filter(x => x.status === params.status);
       if (params?.featured !== undefined) d = d.filter(x => x.is_featured === params.featured);
-      if (params?.city && params.city !== 'all') d = d.filter(x => x.city_edition === params.city || (params.city === 'चित्रकूट' && !x.city_edition));
+      if (params?.city && params.city !== 'all') d = d.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && !x.city_edition));
       if (params?.date) d = d.filter(x => x.edition_date === params.date);
       if (params?.limit) d = d.slice(0, params.limit);
       return d;
@@ -230,70 +243,94 @@ export const epapersService = {
   },
 
   async create(payload: Partial<DbEpaper>) {
-    return trySupabase(async () => {
-      const { data, error } = await supabase.from('epapers').insert(payload).select().single();
-      if (error) throw error;
-      return data as DbEpaper;
-    }, (() => {
-      const local = getLocal();
-      const n: DbEpaper = {
-        id: 'ep-' + Date.now(),
-        title: payload.title || 'ई-पेपर',
-        title_hi: payload.title_hi || payload.title,
-        edition_date: payload.edition_date || new Date().toISOString().slice(0, 10),
-        edition_type: payload.edition_type || 'daily',
-        city_edition: payload.city_edition || 'चित्रकूट (मुख्य)',
-        description: payload.description || '',
-        pdf_storage_path: payload.pdf_storage_path || '',
-        pdf_public_url: payload.pdf_public_url,
-        cover_image_path: payload.cover_image_path,
-        cover_public_url: payload.cover_public_url,
-        page_images: payload.page_images || (payload.cover_public_url ? [payload.cover_public_url] : []),
-        file_size: payload.file_size,
-        page_count: payload.page_count || 4,
-        language: payload.language || 'hi',
-        status: payload.status || 'published',
-        is_featured: !!payload.is_featured,
+    const local = getLocal();
+    const n: DbEpaper = {
+      id: 'ep-' + Date.now(),
+      title: payload.title || 'ई-पेपर',
+      title_hi: payload.title_hi || payload.title,
+      edition_date: payload.edition_date || new Date().toISOString().slice(0, 10),
+      edition_type: payload.edition_type || 'daily',
+      city_edition: payload.city_edition || 'चित्रकूट (मुख्य)',
+      description: payload.description || '',
+      pdf_storage_path: payload.pdf_storage_path || '',
+      pdf_public_url: payload.pdf_public_url,
+      cover_image_path: payload.cover_image_path,
+      cover_public_url: payload.cover_public_url,
+      page_images: payload.page_images || (payload.cover_public_url ? [payload.cover_public_url] : []),
+      file_size: payload.file_size,
+      page_count: payload.page_count || 4,
+      language: payload.language || 'hi',
+      status: payload.status || 'published',
+      is_featured: !!payload.is_featured,
+      views_count: 0,
+      downloads_count: 0,
+      published_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
+    local.unshift(n);
+    setLocal(local);
+
+    // Try inserting to Supabase, but only with columns that match standard schema
+    try {
+      // Clean payload for standard Supabase columns
+      const supabasePayload = {
+        title: n.title,
+        title_hi: n.title_hi,
+        edition_date: n.edition_date,
+        edition_type: n.edition_type,
+        description: n.description,
+        pdf_storage_path: n.pdf_storage_path,
+        pdf_public_url: n.pdf_public_url,
+        cover_image_path: n.cover_image_path,
+        cover_public_url: n.cover_public_url,
+        file_size: n.file_size,
+        page_count: n.page_count,
+        language: n.language,
+        status: n.status,
+        is_featured: n.is_featured,
         views_count: 0,
         downloads_count: 0,
-        published_at: new Date().toISOString(),
-        created_at: new Date().toISOString()
+        published_at: n.published_at,
+        created_at: n.created_at
       };
-      local.unshift(n);
-      setLocal(local);
-      return n;
-    })());
+
+      const { data, error } = await supabase.from('epapers').insert(supabasePayload).select().single();
+      if (!error && data) {
+        return { ...n, ...data };
+      }
+    } catch (err) {
+      console.warn('Supabase create notice (saved to local database):', err);
+    }
+
+    return n;
   },
 
   async update(id: string, payload: Partial<DbEpaper>) {
-    return trySupabase(async () => {
+    const local = getLocal();
+    const idx = local.findIndex(x => x.id === id);
+    if (idx >= 0) {
+      local[idx] = { ...local[idx], ...payload } as DbEpaper;
+      setLocal(local);
+    }
+
+    try {
       const { data, error } = await supabase
         .from('epapers')
         .update({ ...payload, updated_at: new Date().toISOString() } as any)
         .eq('id', id)
         .select()
         .single();
-      if (error) throw error;
-      return data as DbEpaper;
-    }, (() => {
-      const local = getLocal();
-      const idx = local.findIndex(x => x.id === id);
-      if (idx >= 0) {
-        local[idx] = { ...local[idx], ...payload } as DbEpaper;
-        setLocal(local);
-        return local[idx];
-      }
-      throw new Error('Not found');
-    })());
+      if (!error && data) return data as DbEpaper;
+    } catch {}
+
+    return (idx >= 0 ? local[idx] : payload) as DbEpaper;
   },
 
   async remove(id: string) {
-    return trySupabase(async () => {
-      const { error } = await supabase.from('epapers').delete().eq('id', id);
-      if (error) throw error;
-    }, (() => {
-      setLocal(getLocal().filter(x => x.id !== id));
-    })() as any);
+    setLocal(getLocal().filter(x => x.id !== id));
+    try {
+      await supabase.from('epapers').delete().eq('id', id);
+    } catch {}
   },
 
   async uploadPdf(file: File, coverFile?: File) {
