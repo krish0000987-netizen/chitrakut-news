@@ -2,9 +2,9 @@ import { supabase } from '../lib/supabase';
 export interface DbSection { id:string; title:string; title_hi?:string; slug:string; section_type:string; layout_type:string; category_id?:string|null; display_order:number; is_enabled:boolean; item_count:number; settings?:any; created_at:string; updated_at?:string; }
 const LS='cj_homepage_db';
 const seed:DbSection[]=[
-  {id:'sec-hero',title:'Hero',title_hi:'मुखपृष्ठ हीरो',slug:'hero',section_type:'hero',layout_type:'hero_grid',display_order:1,is_enabled:true,item_count:5,created_at:new Date().toISOString()},
-  {id:'sec-latest',title:'Latest News',title_hi:'ताजा समाचार',slug:'latest',section_type:'latest',layout_type:'three_column',display_order:2,is_enabled:true,item_count:6,created_at:new Date().toISOString()},
-  {id:'sec-pradesh',title:'State News',title_hi:'प्रदेश समाचार',slug:'pradesh',section_type:'regional',layout_type:'three_column',display_order:3,is_enabled:true,item_count:4,created_at:new Date().toISOString()},
+  {id:'sec-hero',title:'Hero',title_hi:'मुखपृष्ठ',slug:'hero',section_type:'hero',layout_type:'hero_grid',display_order:1,is_enabled:true,item_count:5,created_at:new Date().toISOString()},
+  {id:'sec-latest',title:'Latest News',title_hi:'ताजा खबरें',slug:'latest',section_type:'latest',layout_type:'three_column',display_order:2,is_enabled:true,item_count:6,created_at:new Date().toISOString()},
+  {id:'sec-pradesh',title:'State News',title_hi:'प्रदेश',slug:'pradesh',section_type:'regional',layout_type:'three_column',display_order:3,is_enabled:true,item_count:4,created_at:new Date().toISOString()},
 ];
 function getLocal():DbSection[]{ try{const r=localStorage.getItem(LS); if(r) return JSON.parse(r); localStorage.setItem(LS,JSON.stringify(seed)); return seed;}catch{return seed} }
 function setLocal(d:DbSection[]){ try{localStorage.setItem(LS,JSON.stringify(d));}catch{} }

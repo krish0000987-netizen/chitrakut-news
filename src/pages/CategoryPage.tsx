@@ -78,7 +78,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ defaultCategory }) =
         <div>
           <span className="text-[11px] font-bold text-[#8B0000] bg-amber-100 px-2 py-0.5 rounded uppercase font-devanagari">{formattedCategory} डेस्क</span>
           <h1 className="font-devanagari font-black text-2xl sm:text-3xl text-slate-900 dark:text-slate-100 mt-1">
-            {isPradesh && selectedCity !== 'सभी शहर' ? `${selectedCity} • ${formattedCategory} समाचार` : `${formattedCategory} समाचार`}
+            {isPradesh && selectedCity !== 'सभी शहर' ? `${selectedCity} • ${formattedCategory}` : `${formattedCategory}`}
           </h1>
           <p className="text-xs text-slate-500 font-devanagari">ताजा अपडेट • भोपाल • मध्यप्रदेश ब्यूरो</p>
         </div>

@@ -573,14 +573,14 @@ export const EpaperReadPage: React.FC = () => {
                           दैनिक चित्रकूट ज्योति
                         </h1>
                         <p className="text-[9px] font-sans font-semibold tracking-widest text-neutral-700 uppercase mt-0.5">
-                          विश्वसनीय • निष्पक्ष • निर्भीक समाचार पत्र
+                          विश्वसनीय • निष्पक्ष • निर्भीक डिजिटल संस्करण
                         </p>
                       </div>
 
                       {/* Headline */}
                       <div className="my-4 border-b border-neutral-300 pb-3">
                         <span className="bg-red-700 text-white text-[10px] font-sans font-bold px-1.5 py-0.5 rounded">
-                          मुख्य समाचार
+                          प्रमुख खबर
                         </span>
                         <h2 className="text-lg font-black font-devanagari leading-snug mt-1.5 text-neutral-900">
                           {epaper.title}
@@ -597,7 +597,7 @@ export const EpaperReadPage: React.FC = () => {
                           <p>दैनिक चित्रकूट ज्योति के डिजिटल संस्करण में आपका स्वागत है। सभी पेज उच्च गुणवत्ता में उपलब्ध हैं।</p>
                         </div>
                         <div className="space-y-1.5">
-                          <p className="font-bold text-black border-b border-neutral-300 pb-0.5">नगर समाचार</p>
+                          <p className="font-bold text-black border-b border-neutral-300 pb-0.5">नगर हलचल</p>
                           <p>विंध्य व महाकौशल क्षेत्र के सभी प्रमुख शहरों का अलग-अलग जिला संस्करण उपलब्ध।</p>
                         </div>
                       </div>

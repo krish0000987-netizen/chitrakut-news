@@ -12,7 +12,7 @@ interface SocialShareButtonsProps {
 
 export const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({
   url = typeof window !== 'undefined' ? window.location.href : '',
-  title = 'दैनिक समाचार',
+  title = 'दैनिक चित्रकूट ज्योति',
   summary = '',
   size = 'md',
   variant = 'badges',

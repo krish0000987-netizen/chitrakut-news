@@ -333,7 +333,7 @@ export const ArticlePage: React.FC = () => {
                 <Share2 className="w-4 h-4" /> यह खबर सोशल मीडिया पर शेयर करें:
               </p>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                सत्य और सटीक समाचार अपने मित्रों एवं ग्रुप में साझा करें
+                सत्य और सटीक खबरें अपने मित्रों एवं ग्रुप में साझा करें
               </p>
             </div>
             <SocialShareButtons

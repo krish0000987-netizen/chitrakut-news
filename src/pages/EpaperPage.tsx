@@ -157,7 +157,7 @@ export const EpaperPage: React.FC = () => {
               दैनिक चित्रकूट ज्योति ई-पेपर
             </h1>
             <p className="text-xs sm:text-sm text-neutral-200 font-devanagari leading-relaxed">
-              सत्य, साहस और सरोकार • चित्रकूट धाम, सतना, रीवा, भोपाल एवं संपूर्ण मध्यभारत का डिजिटल समाचार पत्र।
+              सत्य, साहस और सरोकार • चित्रकूट धाम, सतना, रीवा, भोपाल एवं संपूर्ण मध्यभारत का डिजिटल ई-पेपर।
             </p>
           </div>
         </div>
@@ -257,7 +257,7 @@ export const EpaperPage: React.FC = () => {
                     </div>
 
                     <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-devanagari leading-relaxed max-w-2xl">
-                      {featured.description || 'चित्रकूट धाम, विंध्य अंचल एवं मध्यभारत का प्रतिष्ठित दैनिक समाचार पत्र। उच्च गुणवत्ता डिजिटल संस्करण को मोबाइल एवं कंप्यूटर पर ज़ूम और कतरन (Crop) सुविधा के साथ पढ़ें।'}
+                      {featured.description || 'चित्रकूट धाम, विंध्य अंचल एवं मध्यभारत का प्रतिष्ठित डिजिटल ई-पेपर। उच्च गुणवत्ता डिजिटल संस्करण को मोबाइल एवं कंप्यूटर पर ज़ूम और कतरन (Crop) सुविधा के साथ पढ़ें।'}
                     </p>
 
                     {/* Action Buttons */}

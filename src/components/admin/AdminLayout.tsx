@@ -5,16 +5,16 @@ import { LayoutDashboard, FileText, Layers, MapPin, Users, Image as ImageIcon, N
 
 const navGroups = [
   { label: 'अवलोकन', items: [{ icon: LayoutDashboard, label: 'डैशबोर्ड', path: '/admin' }] },
-  { label: 'समाचार सामग्री', items: [
-    { icon: FileText, label: 'सभी लेख / समाचार', path: '/admin/articles' },
+  { label: 'लेख एवं खबरें', items: [
+    { icon: FileText, label: 'सभी लेख / खबरें', path: '/admin/articles' },
     { icon: FileText, label: 'ड्राफ्ट लेख', path: '/admin/articles?status=draft' },
     { icon: FileText, label: 'शेड्यूल्ड लेख', path: '/admin/articles?status=scheduled' },
-    { icon: Layers, label: 'समाचार श्रेणियाँ', path: '/admin/categories' },
+    { icon: Layers, label: 'कैटेगरी श्रेणियाँ', path: '/admin/categories' },
     { icon: MapPin, label: 'स्थान एवं शहर', path: '/admin/locations' },
     { icon: Users, label: 'लेखक एवं पत्रकार', path: '/admin/authors' },
     { icon: ImageIcon, label: 'मीडिया लाइब्रेरी', path: '/admin/media' },
   ]},
-  { label: 'समाचार पत्र (ई-पेपर)', items: [
+  { label: 'ई-पेपर व डिजिटल एडिशन', items: [
     { icon: Zap, label: 'ब्रेकिंग न्यूज़', path: '/admin/breaking-news' },
     { icon: Newspaper, label: 'ई-पेपर प्रबंधन', path: '/admin/epaper' },
     { icon: Newspaper, label: 'ई-पेपर आर्काइव', path: '/admin/epaper?tab=archive' },

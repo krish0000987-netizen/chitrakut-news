@@ -43,7 +43,7 @@ export const GlobalFooter: React.FC = () => {
               <a href="tel:+918827294576" className="flex items-center gap-2 bg-slate-50 border rounded-lg px-3 py-2 hover:bg-amber-50"><Phone className="w-3.5 h-3.5 text-[#8B0000]" /> 8827294576, 8982635688</a>
               <a href="mailto:chitrakootjyotinews@gmail.com" className="flex items-center gap-2 bg-slate-50 border rounded-lg px-3 py-2 hover:bg-amber-50 break-all"><Mail className="w-3.5 h-3.5 text-[#8B0000]" /> chitrakootjyotinews@gmail.com</a>
             </div>
-            <p className="text-[10px] text-slate-500 mt-2 text-center">{isEn?'For news / ads contact':'संपर्क • विज्ञापन • समाचार हेतु संपर्क करें'}</p>
+            <p className="text-[10px] text-slate-500 mt-2 text-center">{isEn?'For news / ads contact':'संपर्क • विज्ञापन • खबरों हेतु संपर्क करें'}</p>
           </div>
         </div>
 
@@ -64,7 +64,7 @@ export const GlobalFooter: React.FC = () => {
             <ul className={`space-y-1.5 text-slate-300 ${isEn?'':'font-devanagari'}`}>
               <li><Link to="/lifestyle-health" className="hover:text-white">{t.nav.lifestyle}</Link></li>
               <li><Link to="/tech" className="hover:text-white">{t.nav.tech}</Link></li>
-              <li><Link to="/videos" className="hover:text-white">{isEn?'Videos':'वीडियो न्यूज़'}</Link></li>
+              <li><Link to="/videos" className="hover:text-white">{isEn?'Videos':'वीडियो'}</Link></li>
               <li><Link to="/photos" className="hover:text-white">{isEn?'Photos':'फोटो गैलरी'}</Link></li>
               <li><Link to="/epaper" className="hover:text-white">{t.nav.epaper}</Link></li>
               <li><Link to="/live" className="hover:text-white">{isEn?'Live':'लाइव अपडेट'}</Link></li>
@@ -92,7 +92,7 @@ export const GlobalFooter: React.FC = () => {
         </div>
 
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-          <p className={`flex items-center gap-1 ${isEn?'':'font-devanagari'}`}>© 2026 {isEn?'Digital News':'दैनिक समाचार'} • {isEn?'All rights reserved':'सर्वाधिकार सुरक्षित'} • <Heart className="w-3 h-3 text-red-500 inline" /> {isEn?'Published from Bhopal':'भोपाल से प्रकाशित'}</p>
+          <p className={`flex items-center gap-1 ${isEn?'':'font-devanagari'}`}>© 2026 {isEn?'Digital News':'दैनिक चित्रकूट ज्योति'} • {isEn?'All rights reserved':'सर्वाधिकार सुरक्षित'} • <Heart className="w-3 h-3 text-red-500 inline" /> {isEn?'Published from Bhopal':'भोपाल से प्रकाशित'}</p>
           <p className="text-[10px] text-slate-400 text-center font-mono">स्थापना : 2020 • RNI/MPHIN/2020/79309 • Bhopal (M.P.)</p>
         </div>
       </div>

@@ -19,7 +19,7 @@ export const StaticPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="pb-3 mb-6 border-b-2 border-[#8B0000]">
         <h1 className="font-devanagari font-black text-2xl sm:text-3xl text-slate-900 dark:text-slate-100">{pageTitle}</h1>
-        <p className="text-xs text-slate-500 mt-1 font-devanagari">दैनिक समाचार पत्र एवं डिजिटल वेबपोर्टल • भोपाल (मध्यप्रदेश)</p>
+        <p className="text-xs text-slate-500 mt-1 font-devanagari">दैनिक डिजिटल वेबपोर्टल • भोपाल (मध्यप्रदेश)</p>
       </div>
 
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 text-sm leading-relaxed">
@@ -29,9 +29,9 @@ export const StaticPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 items-start">
               <img src="/assets/logo.jpg" alt="Logo" className="h-16 w-auto rounded border shadow-sm bg-white p-1" />
               <div>
-                <p className="font-devanagari font-bold text-lg text-[#8B0000]">आपकी आवाज, आपकी खबर — दैनिक समाचार पोर्टल</p>
+                <p className="font-devanagari font-bold text-lg text-[#8B0000]">आपकी आवाज, आपकी खबर — दैनिक चित्रकूट ज्योति</p>
                 <p className="font-devanagari text-slate-700 dark:text-slate-300 mt-2">
-                  <b>About Us:</b> समाचार पत्र एवं वेबपोर्टल में वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध विधाओं की ताजा व सटीक खबरें मिलेंगी।
+                  <b>About Us:</b> वेबपोर्टल में वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध विधाओं की ताजा व सटीक खबरें मिलेंगी।
                 </p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const StaticPage: React.FC = () => {
                 <input placeholder="मोबाइल / ईमेल" className="w-full p-2.5 rounded border bg-slate-50 dark:bg-slate-950 text-sm" />
                 <textarea placeholder="संदेश लिखें..." className="w-full p-3 rounded border bg-slate-50 dark:bg-slate-950 h-24 text-sm" />
                 <button type="button" className="w-full bg-[#8B0000] text-white font-bold py-2.5 rounded">भेजें</button>
-                <p className="text-[11px] text-slate-500 text-center">समाचार, विज्ञापन, सुझाव हेतु संपर्क करें</p>
+                <p className="text-[11px] text-slate-500 text-center">खबरें, विज्ञापन, सुझाव हेतु संपर्क करें</p>
               </form>
             </div>
           </>
@@ -97,7 +97,7 @@ export const StaticPage: React.FC = () => {
 
         {(slug === 'privacy' || slug === 'terms') && (
           <p className="font-devanagari text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-            यह वेबसाइट दैनिक समाचार पोर्टल द्वारा संचालित है। सभी समाचार, फोटो, वीडियो की कॉपीराइट सुरक्षित है। बिना अनुमति पुनर्प्रकाशन वर्जित। विज्ञापन एवं प्रायोजित सामग्री स्पष्ट रूप से चिह्नित रहती है।
+            यह वेबसाइट दैनिक डिजिटल पोर्टल द्वारा संचालित है। सभी सामग्री, फोटो, वीडियो की कॉपीराइट सुरक्षित है। बिना अनुमति पुनर्प्रकाशन वर्जित। विज्ञापन एवं प्रायोजित सामग्री स्पष्ट रूप से चिह्नित रहती है।
           </p>
         )}
 

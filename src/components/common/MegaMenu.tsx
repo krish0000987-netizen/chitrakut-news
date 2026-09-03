@@ -27,14 +27,14 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4 sticky top-0 bg-[#FEFCF8] dark:bg-[#0F172A] z-10">
           <div className="flex items-center gap-2">
             <span className="font-devanagari font-black text-lg text-[#8B0000]">सभी वर्ग</span>
-            <span className="text-[10px] bg-[#8B0000] text-white font-bold px-2 py-0.5 rounded">समाचार इंडेक्स</span>
+            <span className="text-[10px] bg-[#8B0000] text-white font-bold px-2 py-0.5 rounded">कैटेगरी इंडेक्स</span>
           </div>
           <button onClick={onClose} className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-[#8B0000] hover:text-white"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <h4 className="font-devanagari font-bold text-xs uppercase tracking-wider text-[#8B0000] mb-3 border-b border-red-200 pb-1">मुख्य समाचार</h4>
+            <h4 className="font-devanagari font-bold text-xs uppercase tracking-wider text-[#8B0000] mb-3 border-b border-red-200 pb-1">प्रमुख श्रेणियां</h4>
             <ul className="space-y-2 text-sm font-devanagari">
               <li><Link to="/desh-videsh" onClick={onClose} className="hover:text-[#8B0000] font-medium">देश-विदेश</Link></li>
               <li><Link to="/pradesh" onClick={onClose} className="hover:text-[#8B0000] font-bold text-[#8B0000]">प्रदेश (मध्य प्रदेश)</Link></li>
