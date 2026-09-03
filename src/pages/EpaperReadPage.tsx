@@ -5,10 +5,10 @@ import {
   Maximize2, Minimize2, ExternalLink, MessageCircle, AlertCircle, 
   RefreshCw, ZoomIn, ZoomOut, RotateCcw, Scissors, ChevronLeft, 
   ChevronRight, MapPin, Check, X, Copy, Sparkles, Layers,
-  Smartphone, Monitor, BookOpen
+  Smartphone, Monitor, BookOpen, Loader2
 } from 'lucide-react';
 import { epapersService, DbEpaper, CITIES_EDITIONS } from '../services/epapers';
-import { renderPdfPageToCanvas } from '../lib/pdfHelper';
+import { generatePdfThumbnail, renderPdfPageToCanvas } from '../lib/pdfHelper';
 
 export const EpaperReadPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,15 +18,17 @@ export const EpaperReadPage: React.FC = () => {
   const [epaper, setEpaper] = useState<DbEpaper | null>(null);
   const [allEpapers, setAllEpapers] = useState<DbEpaper[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewerMode, setViewerMode] = useState<'interactive' | 'embedded' | 'native'>('embedded');
+  const [viewerMode, setViewerMode] = useState<'interactive' | 'embedded'>('interactive');
+
+  // Page caching from real PDF
+  const [pageImagesMap, setPageImagesMap] = useState<{ [pageNum: number]: string }>({});
+  const [isRenderingPage, setIsRenderingPage] = useState<boolean>(false);
 
   // Reader Controls
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [zoom, setZoom] = useState<number>(100);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isCropMode, setIsCropMode] = useState<boolean>(false);
-  const [renderingPdf, setRenderingPdf] = useState<boolean>(false);
-  const [pdfRenderError, setPdfRenderError] = useState<boolean>(false);
 
   // Pan / Drag State when zoomed
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -42,7 +44,6 @@ export const EpaperReadPage: React.FC = () => {
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const pageImageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Load E-Paper details
   useEffect(() => {
@@ -58,7 +59,6 @@ export const EpaperReadPage: React.FC = () => {
         if (id && id !== 'latest') {
           selected = list.find(item => item.id === id);
           if (!selected) {
-            // Try fetching directly by ID
             try {
               selected = await epapersService.getById(id);
             } catch {}
@@ -71,6 +71,7 @@ export const EpaperReadPage: React.FC = () => {
         setCurrentPage(1);
         setZoom(100);
         setPanPos({ x: 0, y: 0 });
+        setPageImagesMap({});
       } catch (err) {
         console.error('Failed to load epaper:', err);
       }
@@ -83,53 +84,75 @@ export const EpaperReadPage: React.FC = () => {
     };
   }, [id]);
 
-  // Page List Calculation
-  const totalPages = epaper?.page_count || epaper?.page_images?.length || 4;
+  const pdfUrl = epaper?.pdf_public_url;
+  const totalPages = epaper?.page_count || 4;
   const pagesList = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  // Current page image
-  const getPageImage = (pageNumber: number): string => {
-    if (epaper?.page_images && epaper.page_images.length >= pageNumber) {
-      return epaper.page_images[pageNumber - 1];
-    }
-    if (epaper?.cover_public_url) {
-      return epaper.cover_public_url;
-    }
-    return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80';
-  };
-
-  const currentImageUrl = getPageImage(currentPage);
-  const pdfUrl = epaper?.pdf_public_url;
-
-  // Google Docs Viewer URL provides universal inline rendering on mobile and desktop
-  const googleDocsViewerUrl = pdfUrl
-    ? `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
-    : '';
-
-  // Render PDF page to canvas in interactive mode
+  // Dynamically extract the real page image from PDF whenever currentPage changes
   useEffect(() => {
-    if (viewerMode !== 'interactive' || !pdfUrl || !canvasRef.current) return;
+    if (!pdfUrl) return;
+
+    // Check if we already rendered this page
+    if (pageImagesMap[currentPage]) return;
+
     let isCancelled = false;
+    setIsRenderingPage(true);
 
-    setRenderingPdf(true);
-    setPdfRenderError(false);
-
-    renderPdfPageToCanvas(pdfUrl, currentPage, canvasRef.current, 1.8)
-      .then(() => {
-        if (!isCancelled) setRenderingPdf(false);
+    generatePdfThumbnail(pdfUrl, currentPage, 1400)
+      .then(({ dataUrl, numPages }) => {
+        if (!isCancelled) {
+          setPageImagesMap(prev => ({
+            ...prev,
+            [currentPage]: dataUrl
+          }));
+          setIsRenderingPage(false);
+        }
       })
       .catch((err) => {
-        console.warn('PDF canvas render fallback:', err);
+        console.warn('PDF page rendering fallback:', err);
         if (!isCancelled) {
-          setRenderingPdf(false);
-          setPdfRenderError(true);
+          setIsRenderingPage(false);
         }
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [viewerMode, pdfUrl, currentPage]);
+  }, [pdfUrl, currentPage, pageImagesMap]);
+
+  // Preload remaining pages in background for instant thumbnail switching
+  useEffect(() => {
+    if (!pdfUrl) return;
+
+    let isCancelled = false;
+    const preloadPages = async () => {
+      for (let p = 1; p <= totalPages; p++) {
+        if (isCancelled) break;
+        if (!pageImagesMap[p]) {
+          try {
+            const { dataUrl } = await generatePdfThumbnail(pdfUrl, p, 400);
+            if (!isCancelled) {
+              setPageImagesMap(prev => ({ ...prev, [p]: dataUrl }));
+            }
+          } catch {}
+        }
+      }
+    };
+
+    const timer = setTimeout(preloadPages, 500);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [pdfUrl, totalPages]);
+
+  // Current page image URL: Real rendered PDF page > Cover image > fallback
+  const currentImageUrl = pageImagesMap[currentPage] || epaper?.cover_public_url || '';
+
+  // Google Docs Viewer URL provides universal inline rendering on mobile and desktop
+  const googleDocsViewerUrl = pdfUrl
+    ? `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
+    : '';
 
   // Zoom Handlers
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 250));
@@ -150,6 +173,28 @@ export const EpaperReadPage: React.FC = () => {
       setIsFullscreen(false);
     }
   };
+
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (showCropModal) return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        if (currentPage < totalPages) setCurrentPage(p => p + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (currentPage > 1) setCurrentPage(p => p - 1);
+      } else if (e.key === '+' || e.key === '=') {
+        handleZoomIn();
+      } else if (e.key === '-') {
+        handleZoomOut();
+      } else if (e.key === '0') {
+        handleResetZoom();
+      } else if (e.key.toLowerCase() === 'c') {
+        setIsCropMode(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage, totalPages, showCropModal]);
 
   // Pan Dragging Logic
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -297,7 +342,7 @@ export const EpaperReadPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/epaper"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-[#8B0000] text-neutral-200 hover:text-white text-xs font-bold transition-colors font-devanagari border border-neutral-700"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-[#8B0000] text-neutral-200 hover:text-white text-xs font-bold transition-colors font-devanagari border border-neutral-700 cursor-pointer"
             title="सभी ई-पेपर संस्करण सूची"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -319,27 +364,27 @@ export const EpaperReadPage: React.FC = () => {
         {/* Center: Viewer Mode Tabs */}
         <div className="flex items-center gap-1 bg-neutral-900 p-1 rounded-xl border border-neutral-800">
           <button
-            onClick={() => { setViewerMode('embedded'); setIsCropMode(false); }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 font-devanagari ${
-              viewerMode === 'embedded'
-                ? 'bg-red-600 text-white shadow font-black'
-                : 'text-neutral-400 hover:text-white'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>मोबाइल / वेब PDF</span>
-          </button>
-
-          <button
-            onClick={() => setViewerMode('interactive')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 font-devanagari ${
+            onClick={() => { setViewerMode('interactive'); setIsCropMode(false); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 font-devanagari cursor-pointer ${
               viewerMode === 'interactive'
                 ? 'bg-red-600 text-white shadow font-black'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>पेज ज़ूम & कतरन</span>
+            <span>ई-पेपर ज़ूम & कतरन</span>
+          </button>
+
+          <button
+            onClick={() => { setViewerMode('embedded'); setIsCropMode(false); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 font-devanagari cursor-pointer ${
+              viewerMode === 'embedded'
+                ? 'bg-red-600 text-white shadow font-black'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>वेब PDF मोड</span>
           </button>
         </div>
 
@@ -353,7 +398,7 @@ export const EpaperReadPage: React.FC = () => {
               setIsCropMode(prev => !prev);
               setCropBox(null);
             }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all font-devanagari shadow-sm ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all font-devanagari shadow-sm cursor-pointer ${
               isCropMode
                 ? 'bg-amber-400 text-black ring-2 ring-amber-300 animate-pulse'
                 : 'bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700'
@@ -369,7 +414,7 @@ export const EpaperReadPage: React.FC = () => {
             <a
               href={pdfUrl}
               download
-              className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 transition-colors"
+              className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 transition-colors cursor-pointer"
               title="पूरा अखबार PDF डाउनलोड करें"
             >
               <Download className="w-4 h-4 text-amber-400" />
@@ -379,7 +424,7 @@ export const EpaperReadPage: React.FC = () => {
           {/* WhatsApp Share */}
           <button
             onClick={handleShareReader}
-            className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+            className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
             title="व्हाट्सएप पर शेयर करें"
           >
             <MessageCircle className="w-4 h-4" />
@@ -388,7 +433,7 @@ export const EpaperReadPage: React.FC = () => {
           {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 transition-colors"
+            className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 transition-colors cursor-pointer"
             title={isFullscreen ? 'नॉर्मल स्क्रीन' : 'फुलस्क्रीन पढ़ें'}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -405,7 +450,7 @@ export const EpaperReadPage: React.FC = () => {
           </div>
           <button
             onClick={() => setIsCropMode(false)}
-            className="px-2 py-0.5 bg-black text-white rounded text-[11px] font-bold"
+            className="px-2 py-0.5 bg-black text-white rounded text-[11px] font-bold cursor-pointer"
           >
             रद्द करें (Cancel)
           </button>
@@ -438,7 +483,7 @@ export const EpaperReadPage: React.FC = () => {
             />
           </div>
         ) : (
-          /* Interactive Zoom & Crop Page Canvas */
+          /* Interactive Zoom & Crop Page Canvas with Real PDF Page */
           <div
             className="flex-1 overflow-hidden relative flex items-center justify-center cursor-default"
             onMouseDown={handleMouseDown}
@@ -448,11 +493,12 @@ export const EpaperReadPage: React.FC = () => {
           >
             {/* Interactive Sub-toolbar for Page & Zoom */}
             <div className="absolute top-3 inset-x-0 z-30 flex justify-center pointer-events-none">
-              <div className="bg-black/80 backdrop-blur-md rounded-2xl border border-neutral-700 px-3 py-1.5 flex items-center gap-3 shadow-2xl pointer-events-auto">
+              <div className="bg-black/85 backdrop-blur-md rounded-2xl border border-neutral-700 px-3 py-1.5 flex items-center gap-3 shadow-2xl pointer-events-auto">
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage <= 1}
-                  className="p-1 rounded hover:bg-neutral-700 disabled:opacity-30"
+                  className="p-1 rounded hover:bg-neutral-700 disabled:opacity-30 cursor-pointer"
+                  title="पिछला पेज"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -462,20 +508,21 @@ export const EpaperReadPage: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage >= totalPages}
-                  className="p-1 rounded hover:bg-neutral-700 disabled:opacity-30"
+                  className="p-1 rounded hover:bg-neutral-700 disabled:opacity-30 cursor-pointer"
+                  title="अगला पेज"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
 
                 <div className="h-4 w-px bg-neutral-700" />
 
-                <button onClick={handleZoomOut} className="p-1 hover:text-amber-400" title="ज़ूम आउट">
+                <button onClick={handleZoomOut} className="p-1 hover:text-amber-400 cursor-pointer" title="ज़ूम आउट">
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={handleResetZoom} className="text-[11px] font-mono font-bold hover:text-amber-400">
+                <button onClick={handleResetZoom} className="text-[11px] font-mono font-bold hover:text-amber-400 cursor-pointer" title="रीसेट">
                   {zoom}%
                 </button>
-                <button onClick={handleZoomIn} className="p-1 hover:text-amber-400" title="ज़ूम इन">
+                <button onClick={handleZoomIn} className="p-1 hover:text-amber-400 cursor-pointer" title="ज़ूम इन">
                   <ZoomIn className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -488,15 +535,29 @@ export const EpaperReadPage: React.FC = () => {
                 cursor: isCropMode ? 'crosshair' : zoom > 100 ? (isDragging ? 'grabbing' : 'grab') : 'default'
               }}
             >
-              <div className="relative shadow-2xl bg-white border border-neutral-600 rounded-xs overflow-hidden max-h-[80vh] max-w-[92vw] flex items-center justify-center">
-                <img
-                  ref={pageImageRef}
-                  src={currentImageUrl}
-                  alt={`${epaper.title} - पेज ${currentPage}`}
-                  crossOrigin="anonymous"
-                  className="max-h-[80vh] w-auto object-contain block pointer-events-none"
-                  draggable={false}
-                />
+              <div className="relative shadow-2xl bg-white border border-neutral-600 rounded-xs overflow-hidden min-w-[320px] min-h-[420px] max-h-[82vh] max-w-[92vw] flex items-center justify-center">
+                {isRenderingPage && !currentImageUrl && (
+                  <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-xs flex flex-col items-center justify-center z-10">
+                    <Loader2 className="w-8 h-8 text-red-500 animate-spin mb-2" />
+                    <span className="text-xs font-bold text-white font-devanagari">अखबार पेज लोड हो रहा है...</span>
+                  </div>
+                )}
+
+                {currentImageUrl ? (
+                  <img
+                    ref={pageImageRef}
+                    src={currentImageUrl}
+                    alt={`${epaper.title} - पेज ${currentPage}`}
+                    crossOrigin="anonymous"
+                    className="max-h-[82vh] w-auto object-contain block pointer-events-none"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="p-12 text-center text-neutral-800 dark:text-neutral-200">
+                    <Loader2 className="w-10 h-10 text-red-600 animate-spin mx-auto mb-2" />
+                    <p className="font-bold text-xs font-devanagari">पेज लोड हो रहा है...</p>
+                  </div>
+                )}
 
                 {/* Crop Box Selection Overlay */}
                 {isCropMode && cropBox && (
@@ -530,7 +591,7 @@ export const EpaperReadPage: React.FC = () => {
           <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none no-scrollbar mx-auto sm:mx-0">
             {pagesList.map(pageNum => {
               const isCurrent = pageNum === currentPage;
-              const thumbUrl = getPageImage(pageNum);
+              const thumbUrl = pageImagesMap[pageNum] || epaper?.cover_public_url || '';
               return (
                 <button
                   key={pageNum}
@@ -539,17 +600,23 @@ export const EpaperReadPage: React.FC = () => {
                     setZoom(100);
                     setPanPos({ x: 0, y: 0 });
                   }}
-                  className={`group relative rounded-lg overflow-hidden border-2 transition-all shrink-0 aspect-[3/4] w-12 sm:w-14 bg-neutral-900 ${
+                  className={`group relative rounded-lg overflow-hidden border-2 transition-all shrink-0 aspect-[3/4] w-12 sm:w-14 bg-neutral-900 cursor-pointer ${
                     isCurrent
                       ? 'border-red-500 scale-105 shadow-lg ring-2 ring-red-500/50'
                       : 'border-neutral-700 hover:border-neutral-500 opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img
-                    src={thumbUrl}
-                    alt={`Page ${pageNum}`}
-                    className="w-full h-full object-cover"
-                  />
+                  {thumbUrl ? (
+                    <img
+                      src={thumbUrl}
+                      alt={`Page ${pageNum}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-neutral-800">
+                      <span className="text-[10px] font-mono text-neutral-400">{pageNum}</span>
+                    </div>
+                  )}
                   <div className={`absolute bottom-0 inset-x-0 text-center text-[10px] font-black py-0.5 font-mono ${
                     isCurrent ? 'bg-red-600 text-white' : 'bg-black/80 text-neutral-300'
                   }`}>
@@ -593,7 +660,7 @@ export const EpaperReadPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowCropModal(false)}
-                className="p-1 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white"
+                className="p-1 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -611,7 +678,7 @@ export const EpaperReadPage: React.FC = () => {
               <a
                 href={croppedImageUrl}
                 download={`Chitrakoot-Jyoti-Clipping-${epaper?.edition_date}-Page-${currentPage}.jpg`}
-                className="py-2.5 px-4 bg-white hover:bg-neutral-200 text-black font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-colors font-devanagari"
+                className="py-2.5 px-4 bg-white hover:bg-neutral-200 text-black font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-colors font-devanagari cursor-pointer"
               >
                 <Download className="w-4 h-4 text-red-600" />
                 <span>कतरन फोटो डाउनलोड</span>
@@ -619,7 +686,7 @@ export const EpaperReadPage: React.FC = () => {
 
               <button
                 onClick={handleShareCropped}
-                className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-colors font-devanagari"
+                className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-colors font-devanagari cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>व्हाट्सएप पर भेजें</span>

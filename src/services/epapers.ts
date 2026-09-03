@@ -49,18 +49,8 @@ const SEED_EPAPERS: DbEpaper[] = [
     description: 'दैनिक चित्रकूट ज्योति का आज का ताजा मुख्य संस्करण। चित्रकूट धाम, सतना, बांदा एवं विंध्य क्षेत्र की प्रमुख खबरें।',
     pdf_storage_path: 'sample-chitrakoot.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    cover_image_path: 'sample-cover-1.jpg',
-    cover_public_url: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200&auto=format&fit=crop&q=80',
-    page_images: [
-      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1566378246594-5b154976370c?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?w=1600&auto=format&fit=crop&q=80'
-    ],
     file_size: 4250000,
-    page_count: 6,
+    page_count: 4,
     language: 'hi',
     status: 'published',
     is_featured: true,
@@ -79,14 +69,6 @@ const SEED_EPAPERS: DbEpaper[] = [
     description: 'भोपाल राजधानी विशेष संस्करण, मप्र शासन एवं मंत्रालय की विशेष खबरें।',
     pdf_storage_path: 'sample-bhopal.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    cover_image_path: 'sample-cover-2.jpg',
-    cover_public_url: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&auto=format&fit=crop&q=80',
-    page_images: [
-      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&auto=format&fit=crop&q=80'
-    ],
     file_size: 3840000,
     page_count: 4,
     language: 'hi',
@@ -107,12 +89,6 @@ const SEED_EPAPERS: DbEpaper[] = [
     description: 'सतना, मैहर एवं आसपास के अंचल की विशेष खबरें।',
     pdf_storage_path: 'sample-satna.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    cover_image_path: 'sample-cover-3.jpg',
-    cover_public_url: 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=1200&auto=format&fit=crop&q=80',
-    page_images: [
-      'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80'
-    ],
     file_size: 3120000,
     page_count: 4,
     language: 'hi',
@@ -133,12 +109,6 @@ const SEED_EPAPERS: DbEpaper[] = [
     description: 'रीवा, सीधी, सिंगरौली एवं विंध्य अंचल की मुख्य खबरें।',
     pdf_storage_path: 'sample-rewa.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    cover_image_path: 'sample-cover-4.jpg',
-    cover_public_url: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1200&auto=format&fit=crop&q=80',
-    page_images: [
-      'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80'
-    ],
     file_size: 3400000,
     page_count: 4,
     language: 'hi',

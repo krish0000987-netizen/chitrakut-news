@@ -73,16 +73,25 @@ export const GlobalHeader: React.FC = () => {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Language Toggle */}
             <div className="flex items-center bg-white/20 rounded-full p-0.5">
-              <button onClick={() => setLanguage('hi')} className={`px-2 sm:px-3 py-1 rounded-full text-[11px] font-black transition-colors ${language==='hi' ? 'bg-white text-[#8B0000]' : 'text-white hover:bg-white/10'}`}>हिंदी</button>
-              <button onClick={() => setLanguage('en')} className={`px-2 sm:px-3 py-1 rounded-full text-[11px] font-black transition-colors ${language==='en' ? 'bg-white text-[#8B0000]' : 'text-white hover:bg-white/10'}`}>EN</button>
+              <button onClick={() => setLanguage('hi')} className={`px-2 sm:px-3 py-1 rounded-full text-[11px] font-black transition-colors cursor-pointer ${language==='hi' ? 'bg-white text-[#8B0000]' : 'text-white hover:bg-white/10'}`}>हिंदी</button>
+              <button onClick={() => setLanguage('en')} className={`px-2 sm:px-3 py-1 rounded-full text-[11px] font-black transition-colors cursor-pointer ${language==='en' ? 'bg-white text-[#8B0000]' : 'text-white hover:bg-white/10'}`}>EN</button>
             </div>
 
-            <Link to="/epaper" className="hidden md:flex items-center gap-1 font-bold bg-white text-[#8B0000] px-2.5 py-1 rounded-full hover:bg-amber-100 transition-colors">
-              <Newspaper className="w-3.5 h-3.5" />
+            {/* Top Bar E-Paper Button (Always visible on mobile & desktop) */}
+            <Link 
+              to="/epaper" 
+              className="flex items-center gap-1 font-black bg-white hover:bg-amber-100 text-[#8B0000] px-2.5 sm:px-3 py-1 rounded-full transition-all shadow-xs cursor-pointer text-[10px] sm:text-[11px]"
+              title="दैनिक चित्रकूट ज्योति ई-पेपर पढ़ें"
+            >
+              <Newspaper className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#8B0000]" />
               <span>{t.header.epaper}</span>
             </Link>
-            <a href="tel:+918827294576" className="hidden lg:block font-semibold text-amber-100 hover:text-white">📞 8827294576</a>
-            <button onClick={toggleTheme} className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors" title={theme === 'light' ? 'Dark' : 'Light'}>
+
+            <a href="tel:+918827294576" className="hidden lg:flex items-center gap-1 font-semibold text-amber-100 hover:text-white cursor-pointer">
+              📞 8827294576
+            </a>
+            
+            <button onClick={toggleTheme} className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer" title={theme === 'light' ? 'Dark' : 'Light'}>
               {theme === 'light' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5 text-amber-300" />}
             </button>
           </div>
@@ -253,14 +262,27 @@ export const GlobalHeader: React.FC = () => {
             </div>
 
             {/* Remaining categories */}
-            {mainCategories.filter(c => c.name !== t.nav.home && c.name !== t.nav.deshVidesh).map(cat => {
+            {mainCategories.filter(c => c.name !== t.nav.home && c.name !== t.nav.deshVidesh && c.path !== '/epaper').map(cat => {
               const isActive = location.pathname === cat.path;
               return (
-                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${isActive ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
+                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${isActive ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
                   {cat.name}
                 </Link>
               );
             })}
+
+            {/* E-PAPER SPECIAL HIGHLIGHT PILL */}
+            <Link 
+              to="/epaper" 
+              className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                location.pathname.startsWith('/epaper')
+                  ? 'bg-amber-400 text-black font-black ring-2 ring-amber-300'
+                  : 'bg-white/20 hover:bg-white text-white hover:text-[#8B0000] font-black'
+              }`}
+            >
+              <Newspaper className="w-3.5 h-3.5" />
+              <span>{t.nav.epaper}</span>
+            </Link>
           </div>
         </div>
 
