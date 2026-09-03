@@ -121,23 +121,34 @@ const SEED_EPAPERS: DbEpaper[] = [
   }
 ];
 
+function sanitizeItem(item: DbEpaper): DbEpaper {
+  if (item.cover_public_url && item.cover_public_url.includes('unsplash.com')) {
+    delete item.cover_public_url;
+  }
+  if (item.page_images) {
+    item.page_images = item.page_images.filter(img => !img.includes('unsplash.com'));
+    if (item.page_images.length === 0) delete item.page_images;
+  }
+  return item;
+}
+
 function getLocal(): DbEpaper[] {
   try {
     const r = localStorage.getItem(LS_KEY);
     if (!r) {
       localStorage.setItem(LS_KEY, JSON.stringify(SEED_EPAPERS));
-      return SEED_EPAPERS;
+      return SEED_EPAPERS.map(sanitizeItem);
     }
     const parsed = JSON.parse(r);
-    return parsed.length > 0 ? parsed : SEED_EPAPERS;
+    return parsed.length > 0 ? parsed.map(sanitizeItem) : SEED_EPAPERS.map(sanitizeItem);
   } catch {
-    return SEED_EPAPERS;
+    return SEED_EPAPERS.map(sanitizeItem);
   }
 }
 
 function setLocal(d: DbEpaper[]) {
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(d));
+    localStorage.setItem(LS_KEY, JSON.stringify(d.map(sanitizeItem)));
   } catch {}
 }
 

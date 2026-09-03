@@ -28,20 +28,50 @@ async function getPdfJs() {
 }
 
 /**
- * Loads a PDF Document from URL, File, or ArrayBuffer safely
+ * Loads a PDF Document from URL, File, or ArrayBuffer with multi-tier CORS resilience
  */
 async function loadPdfDoc(pdfSource: string | ArrayBuffer | File | Uint8Array) {
   const pdfjs = await getPdfJs();
   if (!pdfjs) throw new Error('PDF.js library not available');
 
-  let data: any;
   if (pdfSource instanceof File) {
-    data = await pdfSource.arrayBuffer();
-    return await pdfjs.getDocument({ data, cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/', cMapPacked: true }).promise;
+    const data = await pdfSource.arrayBuffer();
+    return await pdfjs.getDocument({ data }).promise;
   } else if (pdfSource instanceof ArrayBuffer || pdfSource instanceof Uint8Array) {
-    return await pdfjs.getDocument({ data: pdfSource, cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/', cMapPacked: true }).promise;
+    return await pdfjs.getDocument({ data: pdfSource }).promise;
   } else if (typeof pdfSource === 'string') {
-    return await pdfjs.getDocument({ url: pdfSource, cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/', cMapPacked: true }).promise;
+    // Tier 1: Direct URL
+    try {
+      return await pdfjs.getDocument({ 
+        url: pdfSource,
+        withCredentials: false,
+        cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/',
+        cMapPacked: true
+      }).promise;
+    } catch (directErr) {
+      console.warn('Tier 1 PDF load failed, trying Tier 2 (fetch arrayBuffer):', directErr);
+    }
+
+    // Tier 2: Fetch ArrayBuffer
+    try {
+      const res = await fetch(pdfSource);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.arrayBuffer();
+      return await pdfjs.getDocument({ data }).promise;
+    } catch (fetchErr) {
+      console.warn('Tier 2 PDF fetch failed, trying Tier 3 (CORS proxy):', fetchErr);
+    }
+
+    // Tier 3: CORS Proxy
+    try {
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(pdfSource)}`;
+      const res = await fetch(proxyUrl);
+      const data = await res.arrayBuffer();
+      return await pdfjs.getDocument({ data }).promise;
+    } catch (proxyErr) {
+      console.error('All PDF load tiers failed:', proxyErr);
+      throw proxyErr;
+    }
   }
   throw new Error('Unsupported PDF source type');
 }
@@ -57,7 +87,8 @@ export async function generatePdfThumbnail(
   try {
     const pdfDoc = await loadPdfDoc(pdfSource);
     const numPages = pdfDoc.numPages;
-    const page = await pdfDoc.getPage(Math.min(pageNumber, numPages));
+    const safePageNum = Math.min(Math.max(1, pageNumber), numPages);
+    const page = await pdfDoc.getPage(safePageNum);
 
     const unscaledViewport = page.getViewport({ scale: 1 });
     const scale = targetWidth / unscaledViewport.width;
@@ -78,7 +109,7 @@ export async function generatePdfThumbnail(
       viewport: viewport,
     }).promise;
 
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
@@ -87,7 +118,7 @@ export async function generatePdfThumbnail(
           else reject(new Error('Canvas toBlob failed'));
         },
         'image/jpeg',
-        0.9
+        0.92
       );
     });
 
@@ -109,7 +140,8 @@ export async function renderPdfPageToCanvas(
 ): Promise<{ width: number; height: number; numPages: number }> {
   const pdfDoc = await loadPdfDoc(pdfSource);
   const numPages = pdfDoc.numPages;
-  const page = await pdfDoc.getPage(Math.min(Math.max(1, pageNumber), numPages));
+  const safePageNum = Math.min(Math.max(1, pageNumber), numPages);
+  const page = await pdfDoc.getPage(safePageNum);
 
   const viewport = page.getViewport({ scale });
   const context = canvas.getContext('2d');

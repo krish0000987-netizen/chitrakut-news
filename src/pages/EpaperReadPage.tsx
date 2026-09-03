@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  Download, Share2, ArrowLeft, Eye, Calendar, FileText, 
-  Maximize2, Minimize2, ExternalLink, MessageCircle, AlertCircle, 
+  Download, ArrowLeft, Maximize2, Minimize2, MessageCircle, AlertCircle, 
   RefreshCw, ZoomIn, ZoomOut, RotateCcw, Scissors, ChevronLeft, 
-  ChevronRight, MapPin, Check, X, Copy, Sparkles, Layers,
-  Smartphone, Monitor, BookOpen, Loader2
+  ChevronRight, X, Smartphone, BookOpen, Loader2, Sparkles, Newspaper
 } from 'lucide-react';
-import { epapersService, DbEpaper, CITIES_EDITIONS } from '../services/epapers';
-import { generatePdfThumbnail, renderPdfPageToCanvas } from '../lib/pdfHelper';
+import { epapersService, DbEpaper } from '../services/epapers';
+import { generatePdfThumbnail } from '../lib/pdfHelper';
 
 export const EpaperReadPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -91,8 +89,6 @@ export const EpaperReadPage: React.FC = () => {
   // Dynamically extract the real page image from PDF whenever currentPage changes
   useEffect(() => {
     if (!pdfUrl) return;
-
-    // Check if we already rendered this page
     if (pageImagesMap[currentPage]) return;
 
     let isCancelled = false;
@@ -120,7 +116,7 @@ export const EpaperReadPage: React.FC = () => {
     };
   }, [pdfUrl, currentPage, pageImagesMap]);
 
-  // Preload remaining pages in background for instant thumbnail switching
+  // Preload remaining pages in background
   useEffect(() => {
     if (!pdfUrl) return;
 
@@ -139,15 +135,19 @@ export const EpaperReadPage: React.FC = () => {
       }
     };
 
-    const timer = setTimeout(preloadPages, 500);
+    const timer = setTimeout(preloadPages, 400);
     return () => {
       isCancelled = true;
       clearTimeout(timer);
     };
   }, [pdfUrl, totalPages]);
 
-  // Current page image URL: Real rendered PDF page > Cover image > fallback
-  const currentImageUrl = pageImagesMap[currentPage] || epaper?.cover_public_url || '';
+  // Sanitize Cover Image to prevent any legacy unsplash URLs
+  const safeCoverUrl = (epaper?.cover_public_url && !epaper.cover_public_url.includes('unsplash.com'))
+    ? epaper.cover_public_url
+    : '';
+
+  const currentImageUrl = pageImagesMap[currentPage] || (currentPage === 1 ? safeCoverUrl : '') || '';
 
   // Google Docs Viewer URL provides universal inline rendering on mobile and desktop
   const googleDocsViewerUrl = pdfUrl
@@ -331,7 +331,7 @@ export const EpaperReadPage: React.FC = () => {
   return (
     <div 
       ref={containerRef}
-      className={`min-h-screen bg-[#1F1F1F] text-white font-sans flex flex-col select-none ${
+      className={`min-h-screen bg-[#181818] text-white font-sans flex flex-col select-none ${
         isFullscreen ? 'fixed inset-0 z-50 overflow-hidden' : ''
       }`}
     >
@@ -414,6 +414,8 @@ export const EpaperReadPage: React.FC = () => {
             <a
               href={pdfUrl}
               download
+              target="_blank"
+              rel="noreferrer"
               className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 transition-colors cursor-pointer"
               title="पूरा अखबार PDF डाउनलोड करें"
             >
@@ -458,7 +460,7 @@ export const EpaperReadPage: React.FC = () => {
       )}
 
       {/* 2. MAIN VIEWER CONTENT */}
-      <main className="flex-1 overflow-hidden relative flex flex-col bg-[#2B2B2B]">
+      <main className="flex-1 overflow-hidden relative flex flex-col bg-[#222222]">
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center space-y-3">
             <RefreshCw className="w-10 h-10 text-red-500 animate-spin" />
@@ -473,10 +475,10 @@ export const EpaperReadPage: React.FC = () => {
             </Link>
           </div>
         ) : viewerMode === 'embedded' && pdfUrl ? (
-          /* Universal Google Docs / Browser Embed (100% Reliable across all devices) */
+          /* Universal Browser Embed / Google Docs Embed */
           <div className="w-full flex-1 bg-neutral-900 relative">
             <iframe
-              src={googleDocsViewerUrl}
+              src={googleDocsViewerUrl || `${pdfUrl}#toolbar=1&navpanes=0`}
               title={epaper.title}
               className="w-full h-full border-0 min-h-[78vh]"
               allow="fullscreen"
@@ -485,7 +487,7 @@ export const EpaperReadPage: React.FC = () => {
         ) : (
           /* Interactive Zoom & Crop Page Canvas with Real PDF Page */
           <div
-            className="flex-1 overflow-hidden relative flex items-center justify-center cursor-default"
+            className="flex-1 overflow-hidden relative flex items-center justify-center cursor-default p-2"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -493,7 +495,7 @@ export const EpaperReadPage: React.FC = () => {
           >
             {/* Interactive Sub-toolbar for Page & Zoom */}
             <div className="absolute top-3 inset-x-0 z-30 flex justify-center pointer-events-none">
-              <div className="bg-black/85 backdrop-blur-md rounded-2xl border border-neutral-700 px-3 py-1.5 flex items-center gap-3 shadow-2xl pointer-events-auto">
+              <div className="bg-black/90 backdrop-blur-md rounded-2xl border border-neutral-700 px-3.5 py-1.5 flex items-center gap-3 shadow-2xl pointer-events-auto">
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage <= 1}
@@ -502,7 +504,7 @@ export const EpaperReadPage: React.FC = () => {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs font-bold font-devanagari">
+                <span className="text-xs font-bold font-devanagari text-amber-300">
                   पेज {currentPage} / {totalPages}
                 </span>
                 <button
@@ -535,11 +537,12 @@ export const EpaperReadPage: React.FC = () => {
                 cursor: isCropMode ? 'crosshair' : zoom > 100 ? (isDragging ? 'grabbing' : 'grab') : 'default'
               }}
             >
-              <div className="relative shadow-2xl bg-white border border-neutral-600 rounded-xs overflow-hidden min-w-[320px] min-h-[420px] max-h-[82vh] max-w-[92vw] flex items-center justify-center">
-                {isRenderingPage && !currentImageUrl && (
+              <div className="relative shadow-2xl bg-white border border-neutral-600 rounded-xs overflow-hidden min-w-[340px] max-h-[82vh] max-w-[94vw] flex items-center justify-center">
+                
+                {isRenderingPage && (
                   <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-xs flex flex-col items-center justify-center z-10">
                     <Loader2 className="w-8 h-8 text-red-500 animate-spin mb-2" />
-                    <span className="text-xs font-bold text-white font-devanagari">अखबार पेज लोड हो रहा है...</span>
+                    <span className="text-xs font-bold text-white font-devanagari">पेज {currentPage} लोड हो रहा है...</span>
                   </div>
                 )}
 
@@ -553,9 +556,57 @@ export const EpaperReadPage: React.FC = () => {
                     draggable={false}
                   />
                 ) : (
-                  <div className="p-12 text-center text-neutral-800 dark:text-neutral-200">
-                    <Loader2 className="w-10 h-10 text-red-600 animate-spin mx-auto mb-2" />
-                    <p className="font-bold text-xs font-devanagari">पेज लोड हो रहा है...</p>
+                  /* Authentic Newspaper Front-Page Layout Mockup (Eliminates typewriter photo completely) */
+                  <div 
+                    ref={pageImageRef as any}
+                    className="w-[500px] h-[700px] bg-[#fbf9f4] text-black p-6 flex flex-col justify-between font-serif border border-neutral-300"
+                  >
+                    <div>
+                      {/* Masthead */}
+                      <div className="border-b-4 border-black pb-2 text-center">
+                        <div className="flex items-center justify-between text-[10px] font-sans font-bold border-b border-black pb-1 mb-1 text-neutral-600">
+                          <span>वर्ष 5 • अंक 182</span>
+                          <span>{epaper.city_edition || 'भोपाल/चित्रकूट'}</span>
+                          <span>{epaper.edition_date}</span>
+                        </div>
+                        <h1 className="text-3xl font-black font-devanagari tracking-tight text-[#8B0000]">
+                          दैनिक चित्रकूट ज्योति
+                        </h1>
+                        <p className="text-[9px] font-sans font-semibold tracking-widest text-neutral-700 uppercase mt-0.5">
+                          विश्वसनीय • निष्पक्ष • निर्भीक समाचार पत्र
+                        </p>
+                      </div>
+
+                      {/* Headline */}
+                      <div className="my-4 border-b border-neutral-300 pb-3">
+                        <span className="bg-red-700 text-white text-[10px] font-sans font-bold px-1.5 py-0.5 rounded">
+                          मुख्य समाचार
+                        </span>
+                        <h2 className="text-lg font-black font-devanagari leading-snug mt-1.5 text-neutral-900">
+                          {epaper.title}
+                        </h2>
+                        <p className="text-xs font-devanagari text-neutral-700 mt-2 leading-relaxed">
+                          {epaper.description || 'चित्रकूट धाम, विंध्य अंचल एवं मध्यप्रदेश की प्रमुख ताज़ा खबरें। पूरा ई-पेपर पढ़ने के लिए ऊपर वेब PDF मोड का उपयोग करें।'}
+                        </p>
+                      </div>
+
+                      {/* 2 Column News Skeleton */}
+                      <div className="grid grid-cols-2 gap-4 text-[10px] font-devanagari text-neutral-600 leading-relaxed">
+                        <div className="space-y-1.5">
+                          <p className="font-bold text-black border-b border-neutral-300 pb-0.5">विशेष संपादकीय</p>
+                          <p>दैनिक चित्रकूट ज्योति के डिजिटल संस्करण में आपका स्वागत है। सभी पेज उच्च गुणवत्ता में उपलब्ध हैं।</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <p className="font-bold text-black border-b border-neutral-300 pb-0.5">नगर समाचार</p>
+                          <p>विंध्य व महाकौशल क्षेत्र के सभी प्रमुख शहरों का अलग-अलग जिला संस्करण उपलब्ध।</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t-2 border-black pt-2 flex items-center justify-between text-[9px] font-sans text-neutral-600">
+                      <span>पेज नं. {currentPage}</span>
+                      <span className="font-bold text-[#8B0000]">chitrakut-news.vercel.app</span>
+                    </div>
                   </div>
                 )}
 
@@ -591,7 +642,7 @@ export const EpaperReadPage: React.FC = () => {
           <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none no-scrollbar mx-auto sm:mx-0">
             {pagesList.map(pageNum => {
               const isCurrent = pageNum === currentPage;
-              const thumbUrl = pageImagesMap[pageNum] || epaper?.cover_public_url || '';
+              const thumbUrl = pageImagesMap[pageNum] || (pageNum === 1 ? safeCoverUrl : '') || '';
               return (
                 <button
                   key={pageNum}
@@ -613,8 +664,9 @@ export const EpaperReadPage: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-neutral-800">
-                      <span className="text-[10px] font-mono text-neutral-400">{pageNum}</span>
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-800 p-1 text-center">
+                      <Newspaper className="w-3.5 h-3.5 text-neutral-500 mb-0.5" />
+                      <span className="text-[9px] font-mono text-neutral-400">P.{pageNum}</span>
                     </div>
                   )}
                   <div className={`absolute bottom-0 inset-x-0 text-center text-[10px] font-black py-0.5 font-mono ${
