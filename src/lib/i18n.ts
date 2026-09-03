@@ -1,4 +1,4 @@
-// Simple bilingual dictionary for Chitrakoot Jyoti
+// Simple bilingual dictionary
 export const translations = {
   hi: {
     nav: {
@@ -36,7 +36,7 @@ export const translations = {
       subscribe: 'सब्सक्राइब',
     },
     home: {
-      pradeshTitle: 'प्रदेश • मध्यप्रदेश / चित्रकूट',
+      pradeshTitle: 'प्रदेश • मध्यप्रदेश',
       techDesk: 'टेक डेस्क',
       khelTitle: 'खेल',
       manoranjan: 'मनोरंजन',
@@ -47,7 +47,7 @@ export const translations = {
       bhavishyaTitle: 'भविष्य जिज्ञासा',
     },
     footer: {
-      tagline: 'दैनिक चित्रकूट ज्योति न्यूज पेपर एवं वेबपोर्टल में वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, सायबर अपराध, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध विधाओं की ताजा खबरें मिलेंगी।',
+      tagline: '“वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध खबरें”',
       mainNews: 'मुख्य समाचार',
       otherSections: 'अन्य वर्ग',
       company: 'कंपनी',
@@ -97,7 +97,7 @@ export const translations = {
       subscribe: 'Subscribe',
     },
     home: {
-      pradeshTitle: 'State • Madhya Pradesh / Chitrakoot',
+      pradeshTitle: 'State • Madhya Pradesh',
       techDesk: 'Tech Desk',
       khelTitle: 'Sports',
       manoranjan: 'Entertainment',
@@ -108,7 +108,7 @@ export const translations = {
       bhavishyaTitle: 'Astrology',
     },
     footer: {
-      tagline: 'Daily Chitrakoot Jyoti brings you ideological, positive, national, crime, cyber, spiritual, astrology, career and lifestyle news — from Bhopal to Chitrakoot.',
+      tagline: '“Ideological, positive, national, crime, spiritual, astrology, vastu, career and lifestyle news.”',
       mainNews: 'Main News',
       otherSections: 'More Sections',
       company: 'Company',

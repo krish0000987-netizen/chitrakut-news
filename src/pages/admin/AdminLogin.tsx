@@ -34,56 +34,58 @@ export const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F4F5] text-black flex">
-      {/* Left Brand Panel - Pure Black High Contrast */}
-      <div className="hidden lg:flex flex-1 bg-black text-white p-10 flex-col justify-between relative overflow-hidden border-r-2 border-black">
+    <div className="min-h-screen bg-[#FDF8F7] text-slate-900 flex">
+      {/* Left Brand Panel - Rich Crimson Red Theme */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#8B0000] via-[#700000] to-[#4c0000] text-white p-10 flex-col justify-between relative overflow-hidden border-r border-red-900 shadow-2xl">
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <img src="/assets/logo.jpg" alt="logo" className="h-10 w-auto rounded bg-white p-1" />
+            <img src="/assets/logo.jpg" alt="Logo" className="h-12 w-auto rounded-xl bg-white p-1.5 shadow" />
             <div>
-              <h1 className="font-black text-xl leading-none font-devanagari">चित्रकूट ज्योति</h1>
-              <p className="text-xs text-amber-400 font-bold tracking-widest uppercase">न्यूज़रूम CMS • भोपाल</p>
+              <p className="text-xs text-amber-300 font-bold tracking-widest uppercase font-mono">न्यूज़रूम CMS • भोपाल</p>
+              <p className="text-[11px] text-red-200">एडमिनिस्ट्रेटर नियंत्रण कक्ष</p>
             </div>
           </div>
-          <h2 className="font-devanagari font-black text-4xl leading-tight mt-16 text-white">सत्य, साहस <br/>और सरोकार</h2>
-          <p className="text-neutral-300 mt-3 max-w-md text-sm leading-relaxed font-devanagari">समाचार, ई-पेपर, ब्रेकिंग न्यूज़ एवं वेबसाइट लेआउट प्रबंधित करने हेतु पेशेवर एडमिन नियंत्रण कक्ष।</p>
+          <h2 className="font-devanagari font-black text-4xl leading-tight mt-16 text-white">
+            सत्य, साहस <br/>और सरोकार
+          </h2>
+          <p className="text-red-100 mt-3 max-w-md text-sm leading-relaxed font-devanagari">
+            समाचार, ई-पेपर, ब्रेकिंग न्यूज़ एवं वेबसाइट लेआउट प्रबंधित करने हेतु आधिकारिक एडमिन नियंत्रण कक्ष।
+          </p>
         </div>
-        <p className="relative z-10 text-xs text-neutral-400 font-mono">© 2026 Chitrakoot Jyoti • Newsroom Management System</p>
+        <p className="relative z-10 text-xs text-red-200 font-mono">© 2026 Digital News • Newsroom Management System</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 justify-center mb-6">
-            <img src="/assets/logo.jpg" alt="logo" className="h-12 w-auto rounded border-2 border-black bg-white" />
-            <div className="text-left">
-              <h1 className="font-black text-lg leading-none text-black font-devanagari">चित्रकूट ज्योति</h1>
-              <p className="text-xs text-neutral-600 font-bold">न्यूज़रूम CMS</p>
-            </div>
+            <img src="/assets/logo.jpg" alt="Logo" className="h-14 w-auto rounded-xl border border-red-200 bg-white p-1 shadow" />
           </div>
 
-          <div className="bg-white rounded-2xl border-2 border-black shadow-xl p-6 sm:p-8">
+          <div className="bg-white rounded-2xl border-2 border-red-100 shadow-xl p-6 sm:p-8">
             <div className="text-center mb-5">
-              <div className="w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow"><Lock className="w-6 h-6" /></div>
-              <h2 className="font-black text-xl tracking-tight text-black font-devanagari">संपादक लॉगिन (Editor Login)</h2>
-              <p className="text-xs text-neutral-600 mt-1 font-devanagari">न्यूज़रूम डैशबोर्ड में प्रवेश करें</p>
+              <div className="w-12 h-12 bg-[#8B0000] text-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h2 className="font-black text-xl tracking-tight text-slate-900 font-devanagari">संपादक लॉगिन (Editor Login)</h2>
+              <p className="text-xs text-slate-500 mt-1 font-devanagari">न्यूज़रूम डैशबोर्ड में प्रवेश करें</p>
             </div>
 
-            <div className="bg-neutral-100 border-2 border-black p-3.5 rounded-xl mb-5 text-xs text-black">
+            <div className="bg-red-50/70 border border-red-200 p-3.5 rounded-xl mb-5 text-xs text-slate-900">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-black uppercase tracking-wider text-[11px] text-black font-devanagari">
+                <span className="font-black uppercase tracking-wider text-[11px] text-[#8B0000] font-devanagari">
                   🔐 सक्रिय एडमिन लॉगिन क्रेडेंशियल्स:
                 </span>
               </div>
               <div className="space-y-1.5 font-mono text-[11px]">
-                <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-black">
+                <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-red-200 shadow-xs">
                   <div>
-                    <span className="text-neutral-500 font-bold">आईडी:</span> <span className="font-black text-black">admin@chitrakootjyoti.com</span><br/>
-                    <span className="text-neutral-500 font-bold">पासवर्ड:</span> <span className="font-black text-black">Admin@123456</span>
+                    <span className="text-slate-500 font-bold">आईडी:</span> <span className="font-black text-slate-900">admin@chitrakootjyoti.com</span><br/>
+                    <span className="text-slate-500 font-bold">पासवर्ड:</span> <span className="font-black text-slate-900">Admin@123456</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => { setEmail('admin@chitrakootjyoti.com'); setPassword('Admin@123456'); }}
-                    className="px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded-lg text-[10px] font-sans font-black shadow"
+                    className="px-2.5 py-1 bg-[#8B0000] hover:bg-[#700000] text-white rounded-lg text-[10px] font-sans font-black shadow-xs"
                   >
                     Auto Fill
                   </button>
@@ -91,43 +93,43 @@ export const AdminLogin: React.FC = () => {
               </div>
             </div>
 
-            {error && <div className="mb-4 p-3 bg-red-50 border-2 border-red-600 text-red-700 rounded-xl text-xs flex gap-2 font-bold"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-            {info && <div className="mb-4 p-3 bg-emerald-50 border-2 border-emerald-600 text-emerald-800 rounded-xl text-xs font-bold">{info}</div>}
+            {error && <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 rounded-xl text-xs flex gap-2 font-bold"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
+            {info && <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold">{info}</div>}
 
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-black text-black mb-1 font-devanagari">ईमेल आईडी (Email) *</label>
+                <label className="block text-xs font-black text-slate-900 mb-1 font-devanagari">ईमेल आईडी (Email) *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-3 text-neutral-500" />
-                  <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin@chitrakootjyoti.com" className="w-full pl-10 pr-3 py-2.5 rounded-xl border-2 border-black bg-white text-black text-sm font-medium outline-none focus:bg-neutral-50" required />
+                  <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin@chitrakootjyoti.com" className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-300 focus:border-[#8B0000] bg-white text-slate-900 text-sm font-medium outline-none" required />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-black text-black mb-1 font-devanagari">पासवर्ड (Password) *</label>
+                <label className="block text-xs font-black text-slate-900 mb-1 font-devanagari">पासवर्ड (Password) *</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-3 text-neutral-500" />
-                  <input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-10 pr-10 py-2.5 rounded-xl border-2 border-black bg-white text-black text-sm font-medium outline-none focus:bg-neutral-50" required />
-                  <button type="button" onClick={()=>setShow(!show)} className="absolute right-3 top-2.5 text-neutral-600 hover:text-black">{show?<EyeOff className="w-4 h-4" />:<Eye className="w-4 h-4" />}</button>
+                  <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <input type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 focus:border-[#8B0000] bg-white text-slate-900 text-sm font-medium outline-none" required />
+                  <button type="button" onClick={()=>setShow(!show)} className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-900">{show?<EyeOff className="w-4 h-4" />:<Eye className="w-4 h-4" />}</button>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <label className="flex items-center gap-1.5 cursor-pointer text-black font-bold font-devanagari"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} className="rounded border-2 border-black accent-black" /> मुझे याद रखें</label>
-                <button type="button" onClick={onForgot} className="text-black font-black hover:underline font-devanagari">पासवर्ड भूल गए?</button>
+                <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 font-bold font-devanagari"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} className="rounded border-slate-300 accent-[#8B0000]" /> मुझे याद रखें</label>
+                <button type="button" onClick={onForgot} className="text-[#8B0000] font-black hover:underline font-devanagari">पासवर्ड भूल गए?</button>
               </div>
 
-              <button type="submit" disabled={loading} className="w-full py-3 bg-black hover:bg-neutral-800 disabled:opacity-60 text-white font-black rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-colors font-devanagari">
+              <button type="submit" disabled={loading} className="w-full py-3 bg-[#8B0000] hover:bg-[#700000] disabled:opacity-60 text-white font-black rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-colors font-devanagari">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 {loading ? 'लॉगिन हो रहा है...' : 'न्यूज़रूम में प्रवेश करें (Sign In)'}
               </button>
             </form>
 
-            <div className="mt-6 pt-4 border-t border-neutral-200 text-xs text-center">
-              <p><Link to="/" className="text-black font-black hover:underline inline-flex items-center gap-1 font-devanagari"><Newspaper className="w-3.5 h-3.5" /> मुख्य वेबसाइट देखें</Link></p>
+            <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-center">
+              <p><Link to="/" className="text-[#8B0000] font-black hover:underline inline-flex items-center gap-1 font-devanagari"><Newspaper className="w-3.5 h-3.5" /> मुख्य वेबसाइट देखें</Link></p>
             </div>
           </div>
 
-          <p className="text-center text-[10px] text-neutral-500 font-mono mt-4 font-bold">Secure • Supabase Auth • Asia/Kolkata</p>
+          <p className="text-center text-[10px] text-slate-500 font-mono mt-4 font-bold">Secure • Supabase Auth • Asia/Kolkata</p>
         </div>
       </div>
     </div>

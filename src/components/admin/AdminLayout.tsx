@@ -47,18 +47,18 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
   const activeItem = navGroups.flatMap(g=>g.items).find(i=> loc.pathname===i.path || (i.path!=='/admin' && loc.pathname.startsWith(i.path)));
 
   return (
-    <div className="min-h-screen bg-[#F4F4F5] text-[#111827] flex font-sans selection:bg-black selection:text-white">
-      {/* Sidebar - Solid High Contrast Black */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-black text-white flex flex-col border-r border-neutral-800 transition-transform lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
-        <div className="p-3.5 border-b border-neutral-800 flex items-center justify-between gap-2 bg-neutral-950">
-          <img src="/assets/logo.jpg" alt="चित्रकूट ज्योति" className="h-11 w-auto rounded-lg bg-white p-1 shadow" />
-          <button onClick={()=>setMobileOpen(false)} className="lg:hidden p-1.5 hover:bg-neutral-800 text-white rounded-lg"><X className="w-5 h-5" /></button>
+    <div className="min-h-screen bg-[#FDF8F7] text-[#111827] flex font-sans selection:bg-[#8B0000] selection:text-white">
+      {/* Sidebar - Solid Rich Crimson Red Theme */}
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#8B0000] text-white flex flex-col border-r border-[#700000] transition-transform lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
+        <div className="p-3.5 border-b border-[#700000] flex items-center justify-between gap-2 bg-[#5e0000]">
+          <img src="/assets/logo.jpg" alt="Logo" className="h-11 w-auto rounded-lg bg-white p-1 shadow" />
+          <button onClick={()=>setMobileOpen(false)} className="lg:hidden p-1.5 hover:bg-[#700000] text-white rounded-lg"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
           {navGroups.map(g=>(
             <div key={g.label}>
-              <p className="text-[10px] font-black tracking-wider text-neutral-400 px-2.5 mb-1.5 uppercase font-devanagari">{g.label}</p>
+              <p className="text-[10px] font-black tracking-wider text-amber-200/90 px-2.5 mb-1.5 uppercase font-devanagari">{g.label}</p>
               <div className="space-y-1">
                 {g.items.map(it=>{
                   const active = loc.pathname === it.path || (it.path!=='/admin' && loc.pathname.startsWith(it.path));
@@ -70,12 +70,12 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
                       onClick={()=>setMobileOpen(false)}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                         active
-                          ? 'bg-white text-black shadow-lg font-black'
-                          : 'text-neutral-200 hover:bg-neutral-900 hover:text-white'
+                          ? 'bg-white text-[#8B0000] shadow-lg font-black'
+                          : 'text-red-100 hover:bg-[#700000] hover:text-white'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-black' : 'text-neutral-400'}`} />
-                      <span className="truncate">{it.label}</span>
+                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[#8B0000]' : 'text-amber-200/80'}`} />
+                      <span className="truncate font-devanagari">{it.label}</span>
                     </Link>
                   );
                 })}
@@ -85,18 +85,18 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
         </div>
 
         {/* User profile footer */}
-        <div className="p-3 border-t border-neutral-800 bg-neutral-950">
-          <div className="flex items-center gap-2.5 bg-neutral-900/90 rounded-xl p-2.5 border border-neutral-800">
-            <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-black text-xs shrink-0">
+        <div className="p-3 border-t border-[#700000] bg-[#5e0000]">
+          <div className="flex items-center gap-2.5 bg-[#4c0000] rounded-xl p-2.5 border border-[#700000]">
+            <div className="w-8 h-8 rounded-full bg-white text-[#8B0000] flex items-center justify-center font-black text-xs shrink-0 shadow">
               {user?.email?.[0]?.toUpperCase() || 'A'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-white truncate">{user?.email || 'admin'}</p>
-              <p className="text-[10px] text-amber-400 font-semibold">सुपर एडमिन (Admin)</p>
+              <p className="text-[10px] text-amber-300 font-semibold">सुपर एडमिन (Admin)</p>
             </div>
             <button
               onClick={onLogout}
-              className="p-1.5 hover:bg-neutral-800 text-neutral-300 hover:text-red-400 rounded-lg transition-colors shrink-0"
+              className="p-1.5 hover:bg-[#700000] text-amber-200 hover:text-white rounded-lg transition-colors shrink-0"
               title="लॉगआउट"
             >
               <LogOut className="w-4 h-4" />
@@ -105,19 +105,19 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
         </div>
       </aside>
 
-      {/* Main Content Area - Clean Crisp White & Black */}
+      {/* Main Content Area - Crisp Light with Red Accents */}
       <div className="flex-1 lg:pl-64 min-w-0 flex flex-col">
-        <header className="sticky top-0 z-20 bg-white border-b border-neutral-200 shadow-sm flex items-center justify-between gap-3 px-4 sm:px-6 py-3">
+        <header className="sticky top-0 z-20 bg-white border-b border-red-100 shadow-xs flex items-center justify-between gap-3 px-4 sm:px-6 py-3">
           <div className="flex items-center gap-3">
-            <button onClick={()=>setMobileOpen(true)} className="lg:hidden p-2 -ml-2 text-black hover:bg-neutral-100 rounded-xl">
+            <button onClick={()=>setMobileOpen(true)} className="lg:hidden p-2 -ml-2 text-[#8B0000] hover:bg-red-50 rounded-xl">
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h2 className="font-black text-base sm:text-lg text-black font-devanagari">
+              <h2 className="font-black text-base sm:text-lg text-slate-900 font-devanagari">
                 {activeItem?.label || 'डैशबोर्ड'}
               </h2>
-              <p className="text-[11px] text-neutral-500 font-medium hidden sm:block">
-                चित्रकूट ज्योति न्यूज़ पोर्टल • एडमिन नियंत्रण कक्ष
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                न्यूज़ पोर्टल • एडमिन नियंत्रण कक्ष (Newsroom CMS)
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const AdminLayout: React.FC<{children: React.ReactNode}> = ({ children })
             <Link
               to="/"
               target="_blank"
-              className="inline-flex items-center gap-1.5 bg-black hover:bg-neutral-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shadow"
+              className="inline-flex items-center gap-1.5 bg-[#8B0000] hover:bg-[#700000] text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shadow-sm"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>वेबसाइट देखें</span>

@@ -3,8 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { AdvertisementSlot } from '../components/common/AdvertisementSlot';
 import { StoryCard } from '../components/news/StoryCard';
+import { SocialShareButtons } from '../components/common/SocialShareButtons';
 import { 
-  Bookmark, Share2, Volume2, VolumeX, Printer, Clock, Eye, MessageSquare, 
+  Bookmark, Share2, Printer, Clock, Eye, MessageSquare, 
   ChevronRight, Twitter, Mail, MapPin, ThumbsUp, Send, CheckCircle2, User, Sparkles, AlertCircle, ArrowLeft
 } from 'lucide-react';
 
@@ -15,10 +16,8 @@ export const ArticlePage: React.FC = () => {
     articles, 
     toggleSaveArticle, 
     isArticleSaved, 
-    speechPlayingId, 
-    toggleSpeech,
-    fontSize,
-    setFontSize
+    fontSize, 
+    setFontSize 
   } = useNews();
 
   const [commentText, setCommentText] = useState('');
@@ -44,7 +43,6 @@ export const ArticlePage: React.FC = () => {
   }
 
   const saved = isArticleSaved(article.id);
-  const fullTextToRead = [article.title, article.subheadline, ...article.content].join(' ');
 
   const handleLike = () => {
     if (hasLiked) {
@@ -168,57 +166,73 @@ export const ArticlePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Toolbar (Speech, Save, Share, Font Size, Print) */}
-          <div className="sticky top-14 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur p-3 rounded-lg border border-slate-200 dark:border-slate-800 my-6 flex flex-wrap items-center justify-between gap-3 shadow-md no-print">
-            
-            {/* Audio Reader Play Button */}
-            <button
-              onClick={() => toggleSpeech(article.id, fullTextToRead)}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                speechPlayingId === article.id
-                  ? 'bg-red-800 text-white animate-pulse'
-                  : 'bg-red-50 dark:bg-red-950 text-red-900 dark:text-red-300 hover:bg-red-100'
-              }`}
-            >
-              {speechPlayingId === article.id ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              <span>{speechPlayingId === article.id ? 'Stop Reading' : 'Listen to Article (AI Voice)'}</span>
-            </button>
+          {/* PROMINENT SOCIAL SHARE BAR AT THE STARTING OF ARTICLE */}
+          <div className="my-4 p-3.5 sm:p-4 bg-gradient-to-r from-red-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border-2 border-red-200 dark:border-slate-700 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print font-devanagari">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#8B0000] animate-pulse"></span>
+              <span className="font-black text-xs sm:text-sm text-[#8B0000] dark:text-red-400">
+                सोशल मीडिया पर शेयर करें:
+              </span>
+            </div>
+            <SocialShareButtons
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={article.hindiTitle || article.title}
+              summary={article.subheadline}
+              variant="badges"
+              showLabel={false}
+            />
+          </div>
 
-            {/* Font Sizer Controls */}
-            <div className="flex items-center space-x-1 text-xs font-sans-ui font-semibold text-slate-600 dark:text-slate-400">
-              <span className="mr-1 hidden sm:inline">Text Size:</span>
-              {(['sm', 'md', 'lg', 'xl'] as const).map(s => (
-                <button
-                  key={s}
-                  onClick={() => setFontSize(s)}
-                  className={`px-2 py-0.5 rounded text-xs uppercase font-bold ${
-                    fontSize === s ? 'bg-red-900 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+          {/* Sticky Toolbar (Save, Font Size, Print, Quick Share) */}
+          <div className="sticky top-14 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 my-4 flex flex-wrap items-center justify-between gap-2.5 shadow-sm no-print">
+            
+            {/* Quick Share Icons in Toolbar */}
+            <div className="flex items-center space-x-2">
+              <SocialShareButtons
+                url={typeof window !== 'undefined' ? window.location.href : ''}
+                title={article.hindiTitle || article.title}
+                summary={article.subheadline}
+                variant="compact"
+                showLabel={false}
+              />
             </div>
 
-            {/* Social Share & Save */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => toggleSaveArticle(article.id)}
-                className={`p-2 rounded-full border transition-colors ${
-                  saved ? 'bg-red-800 text-white border-red-800' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-200'
-                }`}
-                title={saved ? "Saved in bookmarks" : "Save article"}
-              >
-                <Bookmark className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
-              </button>
+            {/* Font Sizer Controls & Action Buttons */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1 text-xs font-sans-ui font-semibold text-slate-600 dark:text-slate-400">
+                <span className="mr-1 hidden sm:inline">Text Size:</span>
+                {(['sm', 'md', 'lg', 'xl'] as const).map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setFontSize(s)}
+                    className={`px-2 py-0.5 rounded text-xs uppercase font-bold ${
+                      fontSize === s ? 'bg-red-900 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
 
-              <button
-                onClick={handlePrint}
-                className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-300"
-                title="Print Article"
-              >
-                <Printer className="w-4 h-4" />
-              </button>
+              <div className="flex items-center space-x-1.5 border-l pl-3 border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => toggleSaveArticle(article.id)}
+                  className={`p-2 rounded-full border transition-colors ${
+                    saved ? 'bg-red-800 text-white border-red-800' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-200'
+                  }`}
+                  title={saved ? "Saved in bookmarks" : "Save article"}
+                >
+                  <Bookmark className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
+                </button>
+
+                <button
+                  onClick={handlePrint}
+                  className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-300"
+                  title="Print Article"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -310,6 +324,25 @@ export const ArticlePage: React.FC = () => {
             <div className="text-xs text-slate-500 font-sans-ui">
               <span>{comments.length} Reader Comments</span>
             </div>
+          </div>
+
+          {/* Social Share Banner with Logos (Facebook, X, WhatsApp, Instagram) */}
+          <div className="my-6 p-4 sm:p-5 bg-gradient-to-r from-red-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border-2 border-red-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-devanagari">
+            <div>
+              <p className="font-black text-sm text-[#8B0000] dark:text-red-400 flex items-center gap-1.5">
+                <Share2 className="w-4 h-4" /> यह खबर सोशल मीडिया पर शेयर करें:
+              </p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                सत्य और सटीक समाचार अपने मित्रों एवं ग्रुप में साझा करें
+              </p>
+            </div>
+            <SocialShareButtons
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={article.hindiTitle || article.title}
+              summary={article.subheadline}
+              variant="badges"
+              showLabel={false}
+            />
           </div>
 
           {/* Author Bio Box */}

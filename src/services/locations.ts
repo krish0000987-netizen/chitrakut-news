@@ -3,9 +3,15 @@ export interface DbLocation { id:string; name:string; name_hi?:string; slug:stri
 const LS='cj_locations_db';
 const seed:DbLocation[]=[
   {id:'loc-mp',name:'Madhya Pradesh',name_hi:'मध्यप्रदेश',slug:'madhya-pradesh',type:'state',is_active:true,created_at:new Date().toISOString()},
-  {id:'loc-up',name:'Uttar Pradesh',name_hi:'उत्तर प्रदेश',slug:'uttar-pradesh',type:'state',is_active:true,created_at:new Date().toISOString()},
-  {id:'loc-chitrakoot',name:'Chitrakoot',name_hi:'चित्रकूट',slug:'chitrakoot',type:'district',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
-  {id:'loc-bhopal',name:'Bhopal',name_hi:'भोपाल',slug:'bhopal',type:'city',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-bhopal',name:'Bhopal',name_hi:'भोपाल',slug:'bhopal',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-indore',name:'Indore',name_hi:'इंदौर',slug:'indore',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-jabalpur',name:'Jabalpur',name_hi:'जबलपुर',slug:'jabalpur',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-gwalior',name:'Gwalior',name_hi:'ग्वालियर',slug:'gwalior',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-satna',name:'Satna',name_hi:'सतना',slug:'satna',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-sagar',name:'Sagar',name_hi:'सागर',slug:'sagar',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-harda',name:'Harda',name_hi:'हरदा',slug:'harda',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-vidisha',name:'Vidisha',name_hi:'विदिशा',slug:'vidisha',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
+  {id:'loc-narsinghpur',name:'Narsinghpur',name_hi:'नरसिंहपुर',slug:'narsinghpur',type:'city',parent_id:'loc-mp',is_active:true,created_at:new Date().toISOString()},
 ];
 function getLocal():DbLocation[]{ try{const r=localStorage.getItem(LS); if(r) return JSON.parse(r); localStorage.setItem(LS,JSON.stringify(seed)); return seed;}catch{return seed} }
 function setLocal(d:DbLocation[]){ try{localStorage.setItem(LS,JSON.stringify(d));}catch{} }

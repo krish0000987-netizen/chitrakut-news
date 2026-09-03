@@ -243,7 +243,7 @@ export const EpaperReadPage: React.FC = () => {
           {/* Quick Bottom Bar */}
           <div className="p-3 bg-neutral-100 dark:bg-slate-800/80 border-t-2 border-black dark:border-slate-700 flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="font-black text-black dark:text-white font-devanagari">
-              दैनिक चित्रकूट ज्योति • डिजिटल ई-पेपर
+              डिजिटल ई-पेपर • भोपाल मुख्य संस्करण
             </span>
             <div className="flex items-center gap-2 font-bold">
               {pdfUrl && (

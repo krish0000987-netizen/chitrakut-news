@@ -82,7 +82,7 @@ export const AnalyticsDashboard: React.FC = () => {
                     <div key={day} className="flex items-center gap-2">
                       <span className="text-[11px] font-mono w-24">{day}</span>
                       <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#8B0000]" style={{ width: `${Math.min(100, (cnt / Math.max(...Object.values(summary.byDay as any)))*100)}%` }} />
+                        <div className="h-full bg-[#8B0000]" style={{ width: `${Math.min(100, (Number(cnt) / Math.max(...(Object.values(summary.byDay as Record<string, number>).map(Number)), 1))*100)}%` }} />
                       </div>
                       <span className="text-xs font-bold w-8 text-right">{cnt}</span>
                     </div>

@@ -6,7 +6,7 @@ export const StaticPage: React.FC = () => {
   const { pageSlug } = useParams<{ pageSlug: string }>();
   const slug = pageSlug || window.location.pathname.replace('/','') || 'about';
   const titleMap: Record<string,string> = {
-    about: 'हमारे बारे में — चित्रकूट ज्योति',
+    about: 'हमारे बारे में',
     contact: 'संपर्क करें',
     privacy: 'गोपनीयता नीति',
     terms: 'नियम व शर्तें',
@@ -19,7 +19,7 @@ export const StaticPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="pb-3 mb-6 border-b-2 border-[#8B0000]">
         <h1 className="font-devanagari font-black text-2xl sm:text-3xl text-slate-900 dark:text-slate-100">{pageTitle}</h1>
-        <p className="text-xs text-slate-500 mt-1">चित्रकूट ज्योति • भोपाल (मप्र) • दैनिक समाचार पत्र एवं वेबपोर्टल</p>
+        <p className="text-xs text-slate-500 mt-1 font-devanagari">दैनिक समाचार पत्र एवं डिजिटल वेबपोर्टल • भोपाल (मध्यप्रदेश)</p>
       </div>
 
       <div className="bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 text-sm leading-relaxed">
@@ -27,11 +27,11 @@ export const StaticPage: React.FC = () => {
         {(slug === 'about' || slug === '') && (
           <>
             <div className="flex flex-col sm:flex-row gap-4 items-start">
-              <img src="/assets/logo.jpg" alt="लोगो" className="h-16 w-auto rounded border shadow-sm bg-white" />
+              <img src="/assets/logo.jpg" alt="Logo" className="h-16 w-auto rounded border shadow-sm bg-white p-1" />
               <div>
-                <p className="font-devanagari font-bold text-lg text-[#8B0000]">दैनिक चित्रकूट ज्योति न्यूज — आपकी आवाज, आपकी खबर</p>
+                <p className="font-devanagari font-bold text-lg text-[#8B0000]">आपकी आवाज, आपकी खबर — दैनिक समाचार पोर्टल</p>
                 <p className="font-devanagari text-slate-700 dark:text-slate-300 mt-2">
-                  <b>About Us:</b> दैनिक चित्रकूट ज्योति न्यूज पेपर एवं वेबपोर्टल में वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, सायबर अपराध, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध विधाओं की ताजा खबरें मिलेंगी।
+                  <b>About Us:</b> समाचार पत्र एवं वेबपोर्टल में वैचारिक, सकारात्मक, देश-दुनिया, क्राइम, धर्म, ज्योतिष, वास्तु, कैरियर, लाइफस्टाइल सहित विविध विधाओं की ताजा व सटीक खबरें मिलेंगी।
                 </p>
               </div>
             </div>
@@ -40,7 +40,7 @@ export const StaticPage: React.FC = () => {
               <div className="p-4 bg-amber-50 dark:bg-slate-800 rounded-xl border border-amber-200">
                 <h3 className="font-black text-[#8B0000] mb-2">हमारी विशेषताएँ</h3>
                 <ul className="space-y-1 text-xs list-disc pl-4 text-slate-700 dark:text-slate-300">
-                  <li>मध्यप्रदेश • चित्रकूट • भोपाल सहित प्रदेश के हर जिले से ग्राउंड रिपोर्ट</li>
+                  <li>मध्यप्रदेश के सभी जिलों (भोपाल, इंदौर, जबलपुर, ग्वालियर, सतना, सागर, हरदा, विदिशा, नरसिंहपुर) से ग्राउंड रिपोर्ट</li>
                   <li>देश-विदेश, प्रदेश, खेल, धर्म, मनोरंजन, विचार, हेल्थ-लाइफस्टाइल, टेक कवरेज</li>
                   <li>भविष्य जिज्ञासा — राशिफल, पंचांग, व्रत-त्यौहार दैनिक अपडेट</li>
                   <li>ई-पेपर — असली अखबार जैसा पठनीय अनुभव मोबाइल पर</li>
@@ -65,8 +65,8 @@ export const StaticPage: React.FC = () => {
             </div>
 
             <div className="bg-[#8B0000] text-white p-4 rounded-xl text-center">
-              <p className="font-devanagari font-bold">“सत्य, साहस और सरोकार — यही है चित्रकूट ज्योति की पहचान”</p>
-              <p className="text-xs text-amber-200 mt-1">वैचारिक • सकारात्मक • विश्वसनीय</p>
+              <p className="font-devanagari font-bold">“सत्य, साहस और सरोकार — वैचारिक • सकारात्मक • निष्पक्ष”</p>
+              <p className="text-xs text-amber-200 mt-1 font-mono">स्थापना : 2020 • RNI/MPHIN/2020/79309 • भोपाल (मप्र)</p>
             </div>
           </>
         )}
@@ -97,7 +97,7 @@ export const StaticPage: React.FC = () => {
 
         {(slug === 'privacy' || slug === 'terms') && (
           <p className="font-devanagari text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-            यह वेबसाइट दैनिक चित्रकूट ज्योति द्वारा संचालित है। सभी समाचार, फोटो, वीडियो की कॉपीराइट सुरक्षित है। बिना अनुमति पुनर्प्रकाशन वर्जित। विज्ञापन एवं प्रायोजित सामग्री स्पष्ट रूप से चिह्नित रहती है।
+            यह वेबसाइट दैनिक समाचार पोर्टल द्वारा संचालित है। सभी समाचार, फोटो, वीडियो की कॉपीराइट सुरक्षित है। बिना अनुमति पुनर्प्रकाशन वर्जित। विज्ञापन एवं प्रायोजित सामग्री स्पष्ट रूप से चिह्नित रहती है।
           </p>
         )}
 
@@ -114,7 +114,7 @@ export const StaticPage: React.FC = () => {
         {slug === 'editorial-policy' && (
           <div className="space-y-3 font-devanagari text-sm">
             <h3 className="font-black text-[#8B0000]">संपादकीय नीति</h3>
-            <p>चित्रकूट ज्योति निष्पक्ष, तथ्यपरक पत्रकारिता के लिए प्रतिबद्ध है। हर खबर दो-स्तरीय संपादकीय जाँच के बाद प्रकाशित होती है। अफवाह, भ्रामक प्रचार से दूरी।</p>
+            <p>हम निष्पक्ष, तथ्यपरक पत्रकारिता के लिए प्रतिबद्ध हैं। हर खबर दो-स्तरीय संपादकीय जाँच के बाद प्रकाशित होती है। अफवाह, भ्रामक प्रचार से दूरी।</p>
           </div>
         )}
 

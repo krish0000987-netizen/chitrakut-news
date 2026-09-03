@@ -50,15 +50,15 @@ export const EpaperPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Masthead Header */}
         <div className="text-center pb-4 border-b-2 border-black dark:border-slate-800">
-          <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-2 font-devanagari">
+          <div className="inline-flex items-center gap-2 bg-[#8B0000] text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-2 font-devanagari">
             <Newspaper className="w-3.5 h-3.5 text-amber-400" />
             <span>डिजिटल ई-पेपर संस्करण</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-black dark:text-white tracking-tight font-devanagari">
-            दैनिक चित्रकूट ज्योति ई-पेपर
+            दैनिक डिजिटल ई-पेपर (E-Paper)
           </h1>
           <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1 font-devanagari">
-            सत्य, साहस और सरोकार • भोपाल, चित्रकूट एवं मध्यभारत का प्रतिष्ठित दैनिक समाचार पत्र
+            सत्य, साहस और सरोकार • भोपाल एवं मध्यभारत का प्रतिष्ठित दैनिक समाचार पत्र
           </p>
         </div>
 
@@ -163,7 +163,7 @@ export const EpaperPage: React.FC = () => {
                   </div>
 
                   <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-devanagari leading-relaxed max-w-2xl">
-                    चित्रकूट ज्योति का आज का ताजा ई-पेपर संस्करण अब वेबसाइट पर उपलब्ध है। मोबाइल एवं डेस्कटॉप पर पूरा अखबार उच्च गुणवत्ता में आसानी से पढ़ें या पीडीएफ डाउनलोड करें।
+                    आज का ताजा डिजिटल ई-पेपर संस्करण अब वेबसाइट पर उपलब्ध है। मोबाइल एवं डेस्कटॉप पर पूरा अखबार उच्च गुणवत्ता में आसानी से पढ़ें या पीडीएफ डाउनलोड करें।
                   </p>
 
                   {/* Primary Action Buttons */}

@@ -59,7 +59,7 @@ export const BhavishyaPage: React.FC = () => {
       <div className="flex flex-wrap items-center gap-2 pb-3 mb-4 border-b-2 border-[#8B0000]">
         <span className="text-[11px] font-bold tracking-widest text-[#8B0000] bg-amber-100 px-2 py-1 rounded">भविष्य जिज्ञासा</span>
         <h1 className="font-devanagari font-black text-2xl sm:text-3xl text-slate-900 dark:text-slate-100">{currentTab.label}</h1>
-        <span className="text-xs text-slate-500 hidden sm:inline">• चित्रकूट ज्योति ज्योतिष डेस्क • भोपाल</span>
+        <span className="text-xs text-slate-500 hidden sm:inline">• वैदिक ज्योतिष डेस्क • भोपाल</span>
       </div>
 
       <div className="flex gap-2 overflow-x-auto no-scrollbar mb-6">
@@ -107,9 +107,9 @@ export const BhavishyaPage: React.FC = () => {
           </div>
           <div className="bg-amber-50 dark:bg-slate-900 rounded-xl border border-amber-200 p-5">
             <h3 className="font-bold font-devanagari text-[#8B0000] mb-2">आज का विशेष</h3>
-            <p className="text-sm font-devanagari leading-relaxed">आज शनिवार को शनि देव की पूजा का विशेष महत्व है। सरसों के तेल का दीपक जलाएं, काले तिल का दान करें। चित्रकूट धाम में आज भक्तों की भीड़।</p>
+            <p className="text-sm font-devanagari leading-relaxed">आज शनिवार को शनि देव एवं हनुमान जी की पूजा का विशेष महत्व है। सरसों के तेल का दीपक जलाएं, काले तिल का दान करें।</p>
             <div className="mt-4 p-3 bg-white dark:bg-slate-800 rounded-lg border text-xs">
-              <p className="font-bold">📍 चित्रकूट ज्योति पंचांग डेस्क</p><p className="text-slate-600">सटीक वैदिक गणना • भोपाल (मप्र) • प्रतिदिन सुबह 5 बजे अपडेट</p>
+              <p className="font-bold font-devanagari">📍 दैनिक पंचांग डेस्क</p><p className="text-slate-600 font-devanagari">सटीक वैदिक गणना • भोपाल (मप्र) • प्रतिदिन सुबह 5 बजे अपडेट</p>
             </div>
           </div>
         </div>
