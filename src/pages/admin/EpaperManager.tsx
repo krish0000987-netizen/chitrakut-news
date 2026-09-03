@@ -7,7 +7,9 @@ export const EpaperManager: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक मुख्य संस्करण');
+  const [cityEdition, setCityEdition] = useState('चित्रकूट (मुख्य)');
   const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0,10));
+  const [pageCount, setPageCount] = useState(6);
   const [isFeatured, setIsFeatured] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -22,8 +24,20 @@ export const EpaperManager: React.FC = () => {
     try{
       const up = await epapersService.uploadPdf(pdfFile, coverFile || undefined);
       await epapersService.create({
-        title, edition_date: editionDate, edition_type:'daily', pdf_storage_path: up.pdfPath, pdf_public_url: up.pdfUrl,
-        cover_image_path: up.coverPath, cover_public_url: up.coverUrl, file_size: up.fileSize, status:'published', is_featured:isFeatured, language:'hi', published_at: new Date().toISOString()
+        title, 
+        edition_date: editionDate, 
+        edition_type:'daily', 
+        city_edition: cityEdition,
+        page_count: Number(pageCount),
+        pdf_storage_path: up.pdfPath, 
+        pdf_public_url: up.pdfUrl,
+        cover_image_path: up.coverPath, 
+        cover_public_url: up.coverUrl, 
+        file_size: up.fileSize, 
+        status:'published', 
+        is_featured:isFeatured, 
+        language:'hi', 
+        published_at: new Date().toISOString()
       } as any);
       setPdfFile(null); setCoverFile(null);
       alert('ई-पेपर सफलतापूर्वक प्रकाशित हो गया है ✓');
@@ -46,7 +60,7 @@ export const EpaperManager: React.FC = () => {
           <Newspaper className="w-5 h-5 text-black" /> नया ई-पेपर संस्करण अपलोड एवं प्रकाशित करें
         </h3>
         
-        <div className="grid md:grid-cols-3 gap-3">
+        <div className="grid md:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-bold text-black mb-1 font-devanagari">संस्करण का नाम / शीर्षक *</label>
             <input
@@ -57,6 +71,22 @@ export const EpaperManager: React.FC = () => {
             />
           </div>
           <div>
+            <label className="block text-xs font-bold text-black mb-1 font-devanagari">शहर / क्षेत्रीय संस्करण (City)</label>
+            <select
+              value={cityEdition}
+              onChange={e=>setCityEdition(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none font-devanagari"
+            >
+              <option value="चित्रकूट (मुख्य)">चित्रकूट (मुख्य)</option>
+              <option value="भोपाल">भोपाल</option>
+              <option value="सतना">सतना</option>
+              <option value="रीवा">रीवा</option>
+              <option value="ग्वालियर">ग्वालियर</option>
+              <option value="इंदौर">इंदौर</option>
+              <option value="जबलपुर">जबलपुर</option>
+            </select>
+          </div>
+          <div>
             <label className="block text-xs font-bold text-black mb-1 font-devanagari">अखबार की तारीख (Date) *</label>
             <input
               type="date"
@@ -65,17 +95,29 @@ export const EpaperManager: React.FC = () => {
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none"
             />
           </div>
-          <div className="flex items-end pb-2">
-            <label className="flex items-center gap-2 text-xs font-bold text-black cursor-pointer font-devanagari">
-              <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={e=>setIsFeatured(e.target.checked)}
-                className="w-4 h-4 rounded border-2 border-black accent-black cursor-pointer"
-              />
-              <span>होमपेज पर मुख्य ई-पेपर बनाएं (Featured)</span>
-            </label>
+          <div>
+            <label className="block text-xs font-bold text-black mb-1 font-devanagari">कुल पेज संख्या (Page Count)</label>
+            <input
+              type="number"
+              min={1}
+              max={64}
+              value={pageCount}
+              onChange={e=>setPageCount(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none font-mono"
+            />
           </div>
+        </div>
+
+        <div className="mt-3 flex items-center gap-2">
+          <label className="flex items-center gap-2 text-xs font-bold text-black cursor-pointer font-devanagari">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={e=>setIsFeatured(e.target.checked)}
+              className="w-4 h-4 rounded border-2 border-black accent-black cursor-pointer"
+            />
+            <span>होमपेज पर मुख्य ई-पेपर बनाएं (Featured Edition)</span>
+          </label>
         </div>
 
         <div className="grid md:grid-cols-2 gap-3 mt-4">
@@ -166,8 +208,18 @@ export const EpaperManager: React.FC = () => {
                     />
                   </td>
                   <td className="p-3">
-                    <p className="font-bold text-sm text-black line-clamp-1 font-devanagari">{e.title}</p>
-                    <p className="text-[11px] text-neutral-600 font-mono mt-0.5">{e.pdf_storage_path?.slice(0, 35)}...</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-sm text-black line-clamp-1 font-devanagari">{e.title}</span>
+                      {e.city_edition && (
+                        <span className="px-2 py-0.5 rounded bg-neutral-100 border border-neutral-300 text-[10px] font-bold text-neutral-800 font-devanagari shrink-0">
+                          {e.city_edition}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-neutral-600 font-mono mt-0.5">
+                      <span>कुल {e.page_count || 4} पेज</span>
+                      <span>• {e.pdf_storage_path?.slice(0, 30)}...</span>
+                    </div>
                   </td>
                   <td className="p-3 text-center font-bold text-black font-mono">{e.edition_date}</td>
                   <td className="p-3 text-center">

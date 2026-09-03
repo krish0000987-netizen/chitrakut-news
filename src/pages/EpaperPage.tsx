@@ -2,42 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Newspaper, Calendar, Download, Eye, Share2, 
-  FileText, Search, Star, ArrowRight, MessageCircle, RefreshCw
+  FileText, Search, Star, ArrowRight, MessageCircle, 
+  RefreshCw, MapPin, Sparkles, Filter, ChevronRight, Layers
 } from 'lucide-react';
-import { epapersService, DbEpaper } from '../services/epapers';
+import { epapersService, DbEpaper, CITIES_EDITIONS } from '../services/epapers';
 
 export const EpaperPage: React.FC = () => {
   const [epapers, setEpapers] = useState<DbEpaper[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchDate, setSearchDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedCity, setSelectedCity] = useState('all');
 
+  const fetchEpapers = async () => {
+    setLoading(true);
+    try {
+      const list = await epapersService.list({ status: 'published' });
+      setEpapers(list);
+    } catch (err) {
+      console.error('Failed to load epapers:', err);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchEpapers = async () => {
-      setLoading(true);
-      try {
-        const list = await epapersService.list({ status: 'published' });
-        setEpapers(list);
-      } catch (err) {
-        console.error('Failed to load epapers:', err);
-      }
-      setLoading(false);
-    };
     fetchEpapers();
   }, []);
 
-  const featured = epapers.find(e => e.is_featured) || epapers[0];
-  const others = epapers.filter(e => !featured || e.id !== featured.id);
-
-  // Filtered others by date if searchDate is entered
-  const filteredList = others.filter(item => {
-    if (searchDate && item.edition_date !== searchDate) return false;
+  // Filter list based on selected city & date
+  const filteredEpapers = epapers.filter(item => {
+    if (selectedDate && item.edition_date !== selectedDate) return false;
+    if (selectedCity !== 'all') {
+      const cityObj = CITIES_EDITIONS.find(c => c.id === selectedCity);
+      if (cityObj) {
+        const matchesCity = item.city_edition?.includes(cityObj.name.replace(' (मुख्य)', '')) ||
+          item.title?.includes(cityObj.name.replace(' (मुख्य)', ''));
+        if (!matchesCity) return false;
+      }
+    }
     return true;
   });
 
+  const featured = filteredEpapers.find(e => e.is_featured) || filteredEpapers[0] || epapers[0];
+  const gridEditions = filteredEpapers.filter(e => !featured || e.id !== featured.id);
+
   const handleShare = (paper: DbEpaper) => {
     const url = `${window.location.origin}/epaper/read/${paper.id}`;
-    const text = `दैनिक चित्रकूट ज्योति ई-पेपर (${paper.edition_date}):\n${paper.title}\nयहाँ पढ़ें: ${url}`;
+    const text = `📰 दैनिक चित्रकूट ज्योति ई-पेपर (${paper.edition_date})\n${paper.title}\nयहाँ ऑनलाइन पूरा अखबार पढ़ें: ${url}`;
     if (navigator.share) {
       navigator.share({ title: paper.title, text, url }).catch(() => {});
     } else {
@@ -46,225 +56,343 @@ export const EpaperPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFCF8] dark:bg-slate-950 text-black dark:text-white py-6 px-3 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Masthead Header */}
-        <div className="text-center pb-4 border-b-2 border-black dark:border-slate-800">
-          <div className="inline-flex items-center gap-2 bg-[#8B0000] text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-2 font-devanagari">
-            <Newspaper className="w-3.5 h-3.5 text-amber-400" />
-            <span>डिजिटल ई-पेपर संस्करण</span>
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-slate-950 text-neutral-900 dark:text-neutral-100 font-sans pb-16">
+      
+      {/* 1. TOP SWADESH-STYLE MASTHEAD BAR */}
+      <div className="bg-white dark:bg-slate-900 border-b border-neutral-200 dark:border-slate-800 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-[#8B0000] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                <Newspaper className="w-6 h-6 text-amber-300" />
+              </div>
+              <div>
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-[#8B0000] dark:text-red-500 font-devanagari block leading-none">
+                  चित्रकूट ज्योति
+                </span>
+                <span className="text-[10px] font-black tracking-widest text-neutral-500 dark:text-neutral-400 uppercase font-mono">
+                  Digital E-Paper Portal
+                </span>
+              </div>
+            </Link>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-black dark:text-white tracking-tight font-devanagari">
-            दैनिक डिजिटल ई-पेपर (E-Paper)
-          </h1>
-          <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1 font-devanagari">
-            सत्य, साहस और सरोकार • भोपाल एवं मध्यभारत का प्रतिष्ठित दैनिक समाचार पत्र
-          </p>
-        </div>
 
-        {/* Search & Filter Bar */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-black dark:border-slate-800 p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-2 bg-neutral-100 dark:bg-slate-800 border-2 border-black dark:border-slate-700 rounded-xl px-3 py-1.5">
-              <Calendar className="w-4 h-4 text-black dark:text-white" />
+          {/* Quick Date Selector & Edition Total */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2 bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-300 dark:border-slate-700">
+              <Calendar className="w-4 h-4 text-red-600" />
               <input
                 type="date"
-                value={searchDate}
-                onChange={e => setSearchDate(e.target.value)}
-                className="bg-transparent text-xs font-bold font-mono outline-none cursor-pointer text-black dark:text-white"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="bg-transparent text-xs font-bold font-mono outline-none cursor-pointer text-neutral-800 dark:text-neutral-200"
+                title="तारीख अनुसार अखबार खोजें"
               />
             </div>
-            {searchDate && (
+            {selectedDate && (
               <button
-                onClick={() => setSearchDate('')}
-                className="text-xs text-red-600 font-bold hover:underline font-devanagari"
+                onClick={() => setSelectedDate('')}
+                className="text-xs text-red-600 font-bold hover:underline font-devanagari px-1"
               >
-                तारीख रीसेट करें
+                तारीख रीसेट
               </button>
             )}
-          </div>
 
-          <div className="text-xs font-black text-neutral-700 dark:text-neutral-300 font-devanagari">
-            कुल {epapers.length} ई-पेपर संस्करण उपलब्ध हैं
+            {featured && (
+              <Link
+                to={`/epaper/read/${featured.id}`}
+                className="bg-[#8B0000] hover:bg-red-800 text-white text-xs font-black px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition-all active:scale-95 font-devanagari"
+              >
+                <Eye className="w-4 h-4 text-amber-300" />
+                <span>आज का मुख्य ई-पेपर पढ़ें</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. REGIONAL CITY / EDITION STRIP (SWADESH NEWS STYLE) */}
+      <div className="bg-[#1A1A1A] text-white sticky top-0 z-30 shadow-md">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="flex items-center gap-1 overflow-x-auto py-2 scrollbar-none no-scrollbar">
+            <span className="text-xs font-black text-amber-400 uppercase tracking-wider px-2 shrink-0 font-devanagari flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>संस्करण:</span>
+            </span>
+
+            {CITIES_EDITIONS.map(city => {
+              const isActive = selectedCity === city.id;
+              return (
+                <button
+                  key={city.id}
+                  onClick={() => setSelectedCity(city.id)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 font-devanagari ${
+                    isActive
+                      ? 'bg-red-600 text-white shadow font-black scale-105'
+                      : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
+                  }`}
+                >
+                  <span>{city.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTAINER */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+        {/* Hero Banner Header */}
+        <div className="bg-gradient-to-r from-[#8B0000] via-red-900 to-neutral-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 max-w-2xl space-y-2">
+            <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border border-amber-400/30 font-devanagari">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>डिजिटल ई-पेपर संस्करण • Digital Replica</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight font-devanagari">
+              दैनिक चित्रकूट ज्योति ई-पेपर
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-200 font-devanagari leading-relaxed">
+              सत्य, साहस और सरोकार • चित्रकूट धाम, सतना, रीवा, भोपाल एवं संपूर्ण मध्यभारत का डिजिटल समाचार पत्र।
+            </p>
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading Spinner */}
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center space-y-3">
-            <RefreshCw className="w-8 h-8 text-black dark:text-white animate-spin" />
+          <div className="py-24 flex flex-col items-center justify-center space-y-3">
+            <RefreshCw className="w-8 h-8 text-red-600 animate-spin" />
             <p className="font-black text-sm font-devanagari">ई-पेपर लोड हो रहे हैं...</p>
           </div>
-        ) : !featured ? (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-black p-12 text-center shadow-sm">
+        ) : filteredEpapers.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-neutral-200 dark:border-slate-800 p-12 text-center shadow-sm">
             <Newspaper className="w-12 h-12 text-neutral-400 mx-auto mb-3" />
-            <h3 className="font-black text-lg text-black dark:text-white font-devanagari">
-              वर्तमान में कोई ई-पेपर उपलब्ध नहीं है
+            <h3 className="font-black text-lg font-devanagari">
+              चयनित तारीख या संस्करण का कोई ई-पेपर उपलब्ध नहीं है
             </h3>
-            <p className="text-xs text-neutral-600 mt-1 font-devanagari">
-              एडमिन पैनल से आज का ई-पेपर पीडीएफ अपलोड होने के बाद यहाँ दिखाई देगा।
+            <p className="text-xs text-neutral-500 mt-1 font-devanagari">
+              कृपया अन्य तारीख या सभी संस्करण का विकल्प चुनें।
             </p>
+            <button
+              onClick={() => { setSelectedCity('all'); setSelectedDate(''); }}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold font-devanagari hover:bg-red-700"
+            >
+              सभी संस्करण देखें
+            </button>
           </div>
         ) : (
           <>
-            {/* 1. TODAY'S FEATURED EDITION (Large, Mobile-Friendly Hero Card) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border-4 border-black dark:border-slate-800 p-4 sm:p-6 shadow-xl relative overflow-hidden">
-              <div className="flex flex-col lg:flex-row gap-6 items-center">
-                {/* Preview Thumbnail */}
-                <div className="w-full sm:w-64 lg:w-72 shrink-0">
-                  <div className="relative group rounded-xl overflow-hidden border-2 border-black shadow-md bg-neutral-100 aspect-[3/4] flex items-center justify-center">
-                    {featured.cover_public_url ? (
-                      <img
-                        src={featured.cover_public_url}
-                        alt={featured.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-center">
-                        <FileText className="w-16 h-16 text-neutral-400 mb-2" />
-                        <span className="font-black text-xs font-devanagari text-neutral-700">
-                          चित्रकूट ज्योति ई-पेपर
-                        </span>
-                        <span className="text-[10px] font-mono text-neutral-500 mt-1">
-                          {featured.edition_date}
+            {/* 3. FEATURED TODAY'S EDITION SHOWCASE (SWADESH HERO CARD) */}
+            {featured && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-neutral-200 dark:border-slate-800 p-4 sm:p-7 shadow-lg relative overflow-hidden">
+                <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 items-center">
+                  
+                  {/* Newspaper Front Page Preview */}
+                  <div className="w-full sm:w-72 lg:w-80 shrink-0">
+                    <Link
+                      to={`/epaper/read/${featured.id}`}
+                      className="block group relative rounded-2xl overflow-hidden border-2 border-neutral-300 dark:border-slate-700 shadow-md bg-neutral-100 dark:bg-slate-800 aspect-[3/4.2]"
+                    >
+                      {featured.cover_public_url ? (
+                        <img
+                          src={featured.cover_public_url}
+                          alt={featured.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                          <FileText className="w-16 h-16 text-neutral-400 mb-2 group-hover:scale-110 transition-transform" />
+                          <span className="font-black text-xs font-devanagari text-neutral-700 dark:text-neutral-300">
+                            {featured.title}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl shadow-lg flex items-center gap-1.5 font-devanagari transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                          <Eye className="w-4 h-4 text-amber-300" />
+                          <span>पूरा अखबार पढ़ें</span>
                         </span>
                       </div>
-                    )}
 
-                    <div className="absolute top-2 left-2 bg-black text-white text-[10px] font-black px-2 py-0.5 rounded shadow uppercase">
-                      ⭐ मुख्य संस्करण
+                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-black px-2.5 py-1 rounded-lg shadow-md uppercase font-devanagari flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
+                        <span>आज का मुख्य अंक</span>
+                      </div>
+
+                      {featured.page_count && (
+                        <div className="absolute bottom-3 right-3 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-xs font-devanagari">
+                          कुल {featured.page_count} पेज
+                        </div>
+                      )}
+                    </Link>
+                  </div>
+
+                  {/* Edition Details & Actions */}
+                  <div className="flex-1 space-y-4 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider font-devanagari border border-amber-300 dark:border-amber-800">
+                      <Calendar className="w-3.5 h-3.5 text-red-600" />
+                      <span>ताजा दैनिक संस्करण • {featured.edition_date}</span>
+                    </div>
+
+                    <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white leading-tight font-devanagari">
+                      {featured.title}
+                    </h2>
+
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs font-bold font-devanagari">
+                      {featured.city_edition && (
+                        <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-slate-700 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-red-600" />
+                          <span>{featured.city_edition}</span>
+                        </span>
+                      )}
+                      <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-slate-700 flex items-center gap-1">
+                        <Layers className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>{featured.page_count || 6} पेज</span>
+                      </span>
+                      {featured.file_size && (
+                        <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-slate-700 font-mono">
+                          📦 {(featured.file_size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-devanagari leading-relaxed max-w-2xl">
+                      {featured.description || 'चित्रकूट धाम, विंध्य अंचल एवं मध्यभारत का प्रतिष्ठित दैनिक समाचार पत्र। उच्च गुणवत्ता डिजिटल संस्करण को मोबाइल एवं कंप्यूटर पर ज़ूम और कतरन (Crop) सुविधा के साथ पढ़ें।'}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                      <Link
+                        to={`/epaper/read/${featured.id}`}
+                        className="px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-sm font-black inline-flex items-center gap-2 shadow-lg transition-transform active:scale-95 font-devanagari"
+                      >
+                        <Eye className="w-4 h-4 text-amber-300" />
+                        <span>ई-पेपर ऑनलाइन पढ़ें (Read E-Paper)</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+
+                      {featured.pdf_public_url && (
+                        <a
+                          href={featured.pdf_public_url}
+                          download
+                          className="px-5 py-3.5 bg-white dark:bg-slate-800 border-2 border-neutral-300 dark:border-slate-700 hover:border-neutral-900 text-neutral-900 dark:text-white rounded-2xl text-sm font-black inline-flex items-center gap-2 transition-colors font-devanagari shadow-xs"
+                        >
+                          <Download className="w-4 h-4 text-red-600" />
+                          <span>PDF डाउनलोड करें</span>
+                        </a>
+                      )}
+
+                      <button
+                        onClick={() => handleShare(featured)}
+                        className="px-4 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-sm font-black inline-flex items-center gap-2 shadow transition-colors font-devanagari"
+                        title="व्हाट्सएप पर शेयर करें"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        <span className="hidden sm:inline">शेयर</span>
+                      </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Content & Actions */}
-                <div className="flex-1 space-y-3 sm:space-y-4 text-center lg:text-left">
-                  <div className="inline-flex items-center gap-2 bg-amber-400 text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider font-devanagari">
-                    <Star className="w-3.5 h-3.5 fill-black" />
-                    <span>आज का ताजा अंक (Today's Issue)</span>
-                  </div>
-
-                  <h2 className="text-2xl sm:text-3xl font-black text-black dark:text-white leading-tight font-devanagari">
-                    {featured.title}
-                  </h2>
-
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs font-bold text-neutral-700 dark:text-neutral-300 font-devanagari">
-                    <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-black/20 font-mono">
-                      📅 {featured.edition_date}
-                    </span>
-                    {featured.file_size && (
-                      <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-black/20 font-mono">
-                        📦 {(featured.file_size / 1024 / 1024).toFixed(2)} MB
-                      </span>
-                    )}
-                    <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-black/20">
-                      दैनिक संस्करण
-                    </span>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-devanagari leading-relaxed max-w-2xl">
-                    आज का ताजा डिजिटल ई-पेपर संस्करण अब वेबसाइट पर उपलब्ध है। मोबाइल एवं डेस्कटॉप पर पूरा अखबार उच्च गुणवत्ता में आसानी से पढ़ें या पीडीएफ डाउनलोड करें।
-                  </p>
-
-                  {/* Primary Action Buttons */}
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
-                    <Link
-                      to={`/epaper/read/${featured.id}`}
-                      className="px-6 py-3 bg-black hover:bg-neutral-800 text-white rounded-xl text-sm font-black inline-flex items-center gap-2 shadow-lg transition-transform active:scale-95 font-devanagari"
-                    >
-                      <Eye className="w-4 h-4 text-amber-400" />
-                      <span>ई-पेपर पढ़ें (Read Online)</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-
-                    {featured.pdf_public_url && (
-                      <a
-                        href={featured.pdf_public_url}
-                        download
-                        className="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-black dark:border-slate-700 hover:bg-neutral-100 text-black dark:text-white rounded-xl text-sm font-black inline-flex items-center gap-2 transition-colors font-devanagari"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span>PDF डाउनलोड करें</span>
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => handleShare(featured)}
-                      className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black inline-flex items-center gap-2 shadow transition-colors font-devanagari"
-                      title="व्हाट्सएप पर शेयर करें"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span className="hidden sm:inline">शेयर</span>
-                    </button>
-                  </div>
-                </div>
               </div>
-            </div>
+            )}
 
-            {/* 2. PREVIOUS EDITIONS GRID */}
-            {filteredList.length > 0 && (
+            {/* 4. ALL EDITIONS / PAST EDITIONS GRID (SWADESH NEWS STYLE) */}
+            {gridEditions.length > 0 && (
               <div className="space-y-4 pt-4">
-                <div className="flex items-center justify-between pb-2 border-b-2 border-black dark:border-slate-800">
-                  <h3 className="text-lg font-black text-black dark:text-white font-devanagari flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-[#8B0000]" />
-                    <span>पिछले प्रकाशित संस्करण (Past Editions)</span>
-                  </h3>
+                <div className="flex items-center justify-between pb-3 border-b-2 border-neutral-200 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-600" />
+                    <h3 className="text-lg sm:text-xl font-black font-devanagari text-neutral-900 dark:text-white">
+                      उपलब्ध अन्य संस्करण (Available Regional Editions)
+                    </h3>
+                  </div>
                   <span className="text-xs font-bold text-neutral-500 font-mono">
-                    {filteredList.length} अंक
+                    {gridEditions.length} संस्करण
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {filteredList.map(item => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                  {gridEditions.map(item => (
                     <div
                       key={item.id}
-                      className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-black dark:border-slate-800 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                      className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                     >
-                      <div>
-                        {/* Miniature Cover */}
-                        <div className="w-full h-44 bg-neutral-100 dark:bg-slate-800 rounded-xl border border-neutral-200 dark:border-slate-700 overflow-hidden mb-3 flex items-center justify-center">
+                      {/* Orange/Red Edition Header like Swadesh */}
+                      <div className="bg-[#8B0000] text-white px-3 py-2 text-xs font-black flex items-center justify-between font-devanagari">
+                        <span className="line-clamp-1">{item.city_edition || 'दैनिक संस्करण'}</span>
+                        <span className="font-mono text-[10px] text-amber-300">{item.edition_date}</span>
+                      </div>
+
+                      <div className="p-3.5 space-y-3 flex-1 flex flex-col">
+                        {/* Cover Image */}
+                        <Link
+                          to={`/epaper/read/${item.id}`}
+                          className="w-full aspect-[3/4] bg-neutral-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-neutral-200 dark:border-slate-700 flex items-center justify-center relative block"
+                        >
                           {item.cover_public_url ? (
-                            <img src={item.cover_public_url} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={item.cover_public_url}
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
                           ) : (
                             <div className="text-center p-3">
                               <FileText className="w-12 h-12 text-neutral-400 mx-auto mb-1" />
                               <p className="text-[10px] font-mono text-neutral-500">{item.edition_date}</p>
                             </div>
                           )}
+
+                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-red-600 text-white text-[11px] font-black px-3 py-1.5 rounded-lg shadow font-devanagari flex items-center gap-1">
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>पढ़ें</span>
+                            </span>
+                          </div>
+                        </Link>
+
+                        {/* Title & metadata */}
+                        <div className="flex-1">
+                          <h4 className="font-black text-xs sm:text-sm text-neutral-900 dark:text-white line-clamp-2 font-devanagari group-hover:text-red-600 transition-colors">
+                            {item.title}
+                          </h4>
+                          <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium font-devanagari mt-1">
+                            <span>कुल {item.page_count || 4} पेज</span>
+                            {item.file_size && (
+                              <span>• {(item.file_size / 1024 / 1024).toFixed(1)} MB</span>
+                            )}
+                          </div>
                         </div>
-
-                        <span className="text-[10px] font-mono font-bold bg-neutral-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-neutral-300 dark:border-slate-700">
-                          {item.edition_date}
-                        </span>
-
-                        <h4 className="font-bold text-sm text-black dark:text-white line-clamp-2 mt-1.5 font-devanagari">
-                          {item.title}
-                        </h4>
                       </div>
 
-                      <div className="pt-4 border-t border-neutral-200 dark:border-slate-800 mt-3 flex items-center justify-between gap-2">
+                      {/* Action buttons footer */}
+                      <div className="p-3 bg-neutral-50 dark:bg-slate-800/60 border-t border-neutral-200 dark:border-slate-800 flex items-center gap-2">
                         <Link
                           to={`/epaper/read/${item.id}`}
-                          className="flex-1 py-2 bg-black hover:bg-neutral-800 text-white text-center rounded-xl text-xs font-black inline-flex items-center justify-center gap-1 font-devanagari transition-colors"
+                          className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white text-center rounded-xl text-xs font-black inline-flex items-center justify-center gap-1 font-devanagari transition-colors shadow-xs"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>पढ़ें</span>
+                          <span>ई-पेपर पढ़ें</span>
                         </Link>
 
                         {item.pdf_public_url && (
                           <a
                             href={item.pdf_public_url}
                             download
-                            className="p-2 border-2 border-black dark:border-slate-700 rounded-xl hover:bg-neutral-100 text-black dark:text-white transition-colors"
-                            title="डाउनलोड करें"
+                            className="p-2 border border-neutral-300 dark:border-slate-700 rounded-xl hover:bg-neutral-200 dark:hover:bg-slate-700 text-neutral-800 dark:text-neutral-200 transition-colors"
+                            title="PDF डाउनलोड करें"
                           >
-                            <Download className="w-4 h-4" />
+                            <Download className="w-4 h-4 text-red-600" />
                           </a>
                         )}
 
                         <button
                           onClick={() => handleShare(item)}
-                          className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors"
+                          className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors shadow-xs"
                           title="व्हाट्सएप पर शेयर करें"
                         >
                           <MessageCircle className="w-4 h-4" />

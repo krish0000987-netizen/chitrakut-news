@@ -100,6 +100,10 @@ export default function App() {
               <Route path="settings" element={<SiteSettingsManager />} />
             </Route>
 
+            {/* Dedicated Immersive E-Paper Reader View (Swadesh News / Layout-365 Style) */}
+            <Route path="/epaper/read/:id" element={<EpaperReadPage />} />
+            <Route path="/epaper/read" element={<EpaperReadPage />} />
+
             {/* Public Website */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<HomePage />} />
@@ -143,8 +147,6 @@ export default function App() {
               <Route path="/photos" element={<PhotosPage />} />
               <Route path="/web-stories" element={<WebStoriesPage />} />
               <Route path="/epaper" element={<EpaperPage />} />
-              <Route path="/epaper/read/:id" element={<EpaperReadPage />} />
-              <Route path="/epaper/read" element={<EpaperReadPage />} />
               <Route path="/subscribe" element={<SubscribePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/profile" element={<ProfilePage />} />
