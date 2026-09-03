@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useNews } from '../../context/NewsContext';
 import { MegaMenu } from './MegaMenu';
 import { Search, Sun, Moon, Menu, MapPin, ChevronDown, Newspaper, Sparkles, X } from 'lucide-react';
 import { getT } from '../../lib/i18n';
 
-const citiesHi = ['भोपाल', 'इंदौर', 'जबलपुर', 'ग्वालियर', 'सतना', 'सागर', 'हरदा', 'विदिशा', 'नरसिंहपुर'];
-const citiesEn = ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Satna', 'Sagar', 'Harda', 'Vidisha', 'Narsinghpur'];
+const citiesHi = ['भोपाल', 'इंदौर', 'जबलपुर', 'ग्वालियर', 'सतना', 'रीवा', 'चित्रकूट', 'सागर', 'हरदा', 'विदिशा', 'नरसिंहपुर'];
+const citiesEn = ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Satna', 'Rewa', 'Chitrakoot', 'Sagar', 'Harda', 'Vidisha', 'Narsinghpur'];
 
 export const GlobalHeader: React.FC = () => {
   const { theme, toggleTheme, setIsSearchOpen, language, setLanguage } = useNews();
@@ -19,7 +19,24 @@ export const GlobalHeader: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [mobilePradeshOpen, setMobilePradeshOpen] = useState(false);
 
+  const pradeshRef = useRef<HTMLDivElement>(null);
+  const bhavishyaRef = useRef<HTMLDivElement>(null);
+
   const location = useLocation();
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pradeshRef.current && !pradeshRef.current.contains(e.target as Node)) {
+        setIsPradeshOpen(false);
+      }
+      if (bhavishyaRef.current && !bhavishyaRef.current.contains(e.target as Node)) {
+        setIsBhavishyaOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const currentDate = new Date().toLocaleDateString(language === 'en' ? 'en-IN' : 'hi-IN', {
     weekday: 'long',
@@ -31,8 +48,6 @@ export const GlobalHeader: React.FC = () => {
   const mainCategories = [
     { name: t.nav.home, path: '/' },
     { name: t.nav.deshVidesh, path: '/desh-videsh' },
-    // Pradesh handled with interactive dropdown of 9 cities
-    // Bhavishya handled with interactive dropdown in 1 place
     { name: t.nav.khel, path: '/khel' },
     { name: t.nav.dharm, path: '/dharm' },
     { name: t.nav.manoranjan, path: '/manoranjan' },
@@ -101,7 +116,7 @@ export const GlobalHeader: React.FC = () => {
       {/* BRAND AREA - Clean Masthead Logo */}
       <div className="py-2.5 sm:py-3.5 px-3 sm:px-6 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0B0F17]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-          <button onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} className="lg:hidden p-2 -ml-2 rounded-xl bg-neutral-100 dark:bg-slate-800 text-black dark:text-white shrink-0">
+          <button onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} className="lg:hidden p-2 -ml-2 rounded-xl bg-neutral-100 dark:bg-slate-800 text-black dark:text-white shrink-0 cursor-pointer">
             {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
@@ -139,7 +154,7 @@ export const GlobalHeader: React.FC = () => {
                 <p className="text-[9px] text-slate-500">8827294576</p>
               </div>
             </div>
-            <button onClick={() => setIsSearchOpen(true)} className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-[#8B0000] hover:text-white transition-colors" title={t.header.search}>
+            <button onClick={() => setIsSearchOpen(true)} className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-[#8B0000] hover:text-white transition-colors cursor-pointer" title={t.header.search}>
               <Search className="w-4 h-4" />
             </button>
           </div>
@@ -157,58 +172,84 @@ export const GlobalHeader: React.FC = () => {
 
       {/* PRIMARY NAV */}
       <nav className="bg-[#8B0000] dark:bg-[#7a0000] text-white sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center">
-          <button onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)} className="hidden lg:flex items-center gap-1.5 py-2.5 px-3 bg-[#5a0000] hover:bg-black font-bold text-xs uppercase tracking-wider shrink-0 mr-2 rounded">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center relative">
+          <button onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)} className="hidden lg:flex items-center gap-1.5 py-2.5 px-3 bg-[#5a0000] hover:bg-black font-bold text-xs uppercase tracking-wider shrink-0 mr-2 rounded cursor-pointer">
             <Menu className="w-4 h-4" /> {t.header.वर्ग}
           </button>
 
-          <div className={`flex items-center gap-1 overflow-x-auto no-scrollbar py-1.5 flex-1 font-bold text-[13px] sm:text-sm ${language==='hi'?'font-devanagari':''}`}>
+          <div className={`flex items-center gap-1 py-1.5 flex-1 font-bold text-[13px] sm:text-sm overflow-visible ${language==='hi'?'font-devanagari':''}`}>
             {/* Home */}
-            <Link to="/" className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${location.pathname === '/' ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
+            <Link to="/" className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer shrink-0 ${location.pathname === '/' ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
               {t.nav.home}
             </Link>
 
             {/* Desh Videsh */}
-            <Link to="/desh-videsh" className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${location.pathname === '/desh-videsh' ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
+            <Link to="/desh-videsh" className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer shrink-0 ${location.pathname === '/desh-videsh' ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
               {t.nav.deshVidesh}
             </Link>
 
-            {/* PRADESH (With Interactive Dropdown for 9 Cities) */}
-            <div className="relative" onMouseEnter={() => setIsPradeshOpen(true)} onMouseLeave={() => setIsPradeshOpen(false)}>
+            {/* PRADESH (Interactive Dropdown for 10 Cities) */}
+            <div 
+              ref={pradeshRef} 
+              className="relative shrink-0" 
+              onMouseEnter={() => setIsPradeshOpen(true)} 
+              onMouseLeave={() => setIsPradeshOpen(false)}
+            >
               <button
-                onClick={() => setIsPradeshOpen(!isPradeshOpen)}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap transition-colors ${
-                  location.pathname.startsWith('/pradesh') || isPradeshOpen ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'
+                type="button"
+                onClick={() => setIsPradeshOpen(prev => !prev)}
+                className={`px-2.5 sm:px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer select-none ${
+                  location.pathname.startsWith('/pradesh') || isPradeshOpen 
+                    ? 'bg-white text-[#8B0000] font-black shadow-md ring-2 ring-white/40' 
+                    : 'hover:bg-white/20 text-white'
                 }`}
               >
                 <span>{t.nav.pradesh}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${isPradeshOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isPradeshOpen ? 'rotate-180 text-[#8B0000]' : ''}`} />
               </button>
 
+              {/* City Selection Dropdown Popup */}
               {isPradeshOpen && (
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-xl shadow-2xl border-2 border-[#8B0000] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="bg-[#8B0000] text-white text-xs font-black px-3.5 py-2 flex items-center justify-between font-devanagari">
-                    <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-amber-300" /> प्रदेश के मुख्य शहर</span>
-                    <Link to="/pradesh" onClick={()=>setIsPradeshOpen(false)} className="text-[10px] text-amber-200 hover:text-white underline">सभी खबरें →</Link>
+                <div 
+                  className="absolute top-full left-0 mt-1 w-72 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl border-2 border-[#8B0000] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150"
+                  style={{ minWidth: '280px' }}
+                >
+                  <div className="bg-[#8B0000] text-white text-xs font-black px-3.5 py-2.5 flex items-center justify-between font-devanagari">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-amber-300" /> 
+                      प्रदेश के शहर (Select City)
+                    </span>
+                    <Link 
+                      to="/pradesh" 
+                      onClick={() => setIsPradeshOpen(false)} 
+                      className="text-[10px] text-amber-200 hover:text-white underline cursor-pointer"
+                    >
+                      सभी खबरें →
+                    </Link>
                   </div>
-                  <div className="p-2 grid grid-cols-2 gap-1 font-devanagari text-xs">
+
+                  <div className="p-2.5 grid grid-cols-2 gap-1.5 font-devanagari text-xs max-h-72 overflow-y-auto">
                     {citiesHi.map((cityName, idx) => (
                       <Link
                         key={cityName}
                         to={`/pradesh?city=${encodeURIComponent(cityName)}`}
-                        onClick={() => { setSelectedCity(cityName); setIsPradeshOpen(false); }}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-bold text-slate-800 dark:text-slate-200 hover:bg-red-50 hover:text-[#8B0000] dark:hover:bg-slate-800 transition-colors"
+                        onClick={() => { 
+                          setSelectedCity(cityName); 
+                          setIsPradeshOpen(false); 
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-slate-800 dark:text-slate-200 hover:bg-red-50 hover:text-[#8B0000] dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-red-200 cursor-pointer"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#8B0000]"></span>
-                        <span>{language === 'en' ? citiesEn[idx] : cityName}</span>
+                        <span className="w-2 h-2 rounded-full bg-[#8B0000] shrink-0" />
+                        <span className="truncate">{language === 'en' ? citiesEn[idx] : cityName}</span>
                       </Link>
                     ))}
                   </div>
-                  <div className="p-2 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-center">
+
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-center">
                     <Link
                       to="/pradesh"
-                      onClick={()=>setIsPradeshOpen(false)}
-                      className="text-xs font-bold text-[#8B0000] dark:text-amber-400 hover:underline font-devanagari"
+                      onClick={() => setIsPradeshOpen(false)}
+                      className="text-xs font-black text-[#8B0000] dark:text-amber-400 hover:underline font-devanagari block py-1"
                     >
                       मध्यप्रदेश के सभी जिलों की खबरें देखें →
                     </Link>
@@ -217,31 +258,40 @@ export const GlobalHeader: React.FC = () => {
               )}
             </div>
 
-            {/* BHAVISHYA JIGYASA (SINGLE LOCATION ONLY) */}
-            <div className="relative" onMouseEnter={() => setIsBhavishyaOpen(true)} onMouseLeave={() => setIsBhavishyaOpen(false)}>
-              <Link
-                to="/bhavishya"
-                className={`px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap text-amber-200 hover:text-white transition-colors ${
-                  location.pathname.startsWith('/bhavishya') || isBhavishyaOpen ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20'
+            {/* BHAVISHYA JIGYASA */}
+            <div 
+              ref={bhavishyaRef} 
+              className="relative shrink-0" 
+              onMouseEnter={() => setIsBhavishyaOpen(true)} 
+              onMouseLeave={() => setIsBhavishyaOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setIsBhavishyaOpen(prev => !prev)}
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer ${
+                  location.pathname.startsWith('/bhavishya') || isBhavishyaOpen 
+                    ? 'bg-white text-[#8B0000] font-black shadow-md' 
+                    : 'text-amber-200 hover:text-white hover:bg-white/20'
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>{t.nav.bhavishya}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${isBhavishyaOpen ? 'rotate-180' : ''}`} />
-              </Link>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isBhavishyaOpen ? 'rotate-180' : ''}`} />
+              </button>
+
               {isBhavishyaOpen && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-xl shadow-2xl border-2 border-[#8B0000] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="bg-[#8B0000] text-white text-xs font-black px-3.5 py-2 flex items-center gap-1.5 font-devanagari">
+                <div className="absolute top-full left-0 mt-1 w-60 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl border-2 border-[#8B0000] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="bg-[#8B0000] text-white text-xs font-black px-3.5 py-2.5 flex items-center gap-1.5 font-devanagari">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     <span>भविष्य जिज्ञासा विशेषांक</span>
                   </div>
-                  <div className="p-1 font-devanagari">
+                  <div className="p-1.5 font-devanagari space-y-0.5">
                     {bhavishyaItems.map(item => (
                       <Link
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsBhavishyaOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-amber-50 dark:hover:bg-slate-800 rounded-lg text-black dark:text-white transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-amber-50 dark:hover:bg-slate-800 rounded-xl text-black dark:text-white transition-colors cursor-pointer"
                       >
                         <span>{item.icon}</span>
                         <span>{item.name}</span>
@@ -252,7 +302,7 @@ export const GlobalHeader: React.FC = () => {
                     <Link
                       to="/bhavishya"
                       onClick={() => setIsBhavishyaOpen(false)}
-                      className="text-xs font-black text-[#8B0000] dark:text-amber-400 hover:underline font-devanagari"
+                      className="text-xs font-black text-[#8B0000] dark:text-amber-400 hover:underline font-devanagari block py-1"
                     >
                       संपूर्ण भविष्य जिज्ञासा पोर्टल →
                     </Link>
@@ -265,7 +315,7 @@ export const GlobalHeader: React.FC = () => {
             {mainCategories.filter(c => c.name !== t.nav.home && c.name !== t.nav.deshVidesh && c.path !== '/epaper').map(cat => {
               const isActive = location.pathname === cat.path;
               return (
-                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${isActive ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
+                <Link key={cat.name} to={cat.path} className={`px-2.5 sm:px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer shrink-0 ${isActive ? 'bg-white text-[#8B0000] font-black' : 'hover:bg-white/20 text-white'}`}>
                   {cat.name}
                 </Link>
               );
@@ -274,7 +324,7 @@ export const GlobalHeader: React.FC = () => {
             {/* E-PAPER SPECIAL HIGHLIGHT PILL */}
             <Link 
               to="/epaper" 
-              className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+              className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 ${
                 location.pathname.startsWith('/epaper')
                   ? 'bg-amber-400 text-black font-black ring-2 ring-amber-300'
                   : 'bg-white/20 hover:bg-white text-white hover:text-[#8B0000] font-black'
