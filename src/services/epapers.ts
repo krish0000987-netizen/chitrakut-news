@@ -27,7 +27,7 @@ export interface DbEpaper {
 
 export const CITIES_EDITIONS = [
   { id: 'all', name: 'सभी संस्करण', name_en: 'All Editions' },
-  { id: 'chitrakoot', name: 'चित्रकूट (मुख्य)', name_en: 'Chitrakoot' },
+  { id: 'chitrakoot', name: 'चित्रकूट', name_en: 'Chitrakoot' },
   { id: 'bhopal', name: 'भोपाल', name_en: 'Bhopal' },
   { id: 'satna', name: 'सतना', name_en: 'Satna' },
   { id: 'rewa', name: 'रीवा', name_en: 'Rewa' },
@@ -41,11 +41,11 @@ const LS_KEY = 'cj_epapers_db';
 const SEED_EPAPERS: DbEpaper[] = [
   {
     id: 'ep-today-chitrakoot',
-    title: 'दैनिक चित्रकूट ज्योति - चित्रकूट मुख्य संस्करण',
-    title_hi: 'दैनिक चित्रकूट ज्योति - चित्रकूट मुख्य संस्करण',
+    title: 'दैनिक चित्रकूट ज्योति - चित्रकूट संस्करण',
+    title_hi: 'दैनिक चित्रकूट ज्योति - चित्रकूट संस्करण',
     edition_date: new Date().toISOString().slice(0, 10),
     edition_type: 'daily',
-    city_edition: 'चित्रकूट (मुख्य)',
+    city_edition: 'चित्रकूट',
     description: 'दैनिक चित्रकूट ज्योति का आज का ताजा मुख्य संस्करण। चित्रकूट धाम, सतना, बांदा एवं विंध्य क्षेत्र की प्रमुख खबरें।',
     pdf_storage_path: 'sample-chitrakoot.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
@@ -132,6 +132,15 @@ function sanitizeItem(item: DbEpaper): DbEpaper {
   if (!item.page_count || item.page_count === 4 || item.page_count === 6) {
     item.page_count = 8;
   }
+  if (item.city_edition === 'चित्रकूट (मुख्य)') {
+    item.city_edition = 'चित्रकूट';
+  }
+  if (item.title) {
+    item.title = item.title.replace('चित्रकूट (मुख्य)', 'चित्रकूट').replace('चित्रकूट मुख्य', 'चित्रकूट');
+  }
+  if (item.title_hi) {
+    item.title_hi = item.title_hi.replace('चित्रकूट (मुख्य)', 'चित्रकूट').replace('चित्रकूट मुख्य', 'चित्रकूट');
+  }
   return item;
 }
 
@@ -189,14 +198,14 @@ export const epapersService = {
       
       let res = (data && data.length > 0) ? (data as DbEpaper[]) : getLocal();
       if (params?.city && params.city !== 'all') {
-        res = res.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && !x.city_edition));
+        res = res.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && (!x.city_edition || x.city_edition.includes('चित्रकूट'))));
       }
       return res;
     }, (() => {
       let d = getLocal();
       if (params?.status) d = d.filter(x => x.status === params.status);
       if (params?.featured !== undefined) d = d.filter(x => x.is_featured === params.featured);
-      if (params?.city && params.city !== 'all') d = d.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && !x.city_edition));
+      if (params?.city && params.city !== 'all') d = d.filter(x => x.city_edition === params.city || x.title?.includes(params.city) || (params.city === 'चित्रकूट' && (!x.city_edition || x.city_edition.includes('चित्रकूट'))));
       if (params?.date) d = d.filter(x => x.edition_date === params.date);
       if (params?.limit) d = d.slice(0, params.limit);
       return d;
@@ -234,7 +243,7 @@ export const epapersService = {
       title_hi: payload.title_hi || payload.title,
       edition_date: payload.edition_date || new Date().toISOString().slice(0, 10),
       edition_type: payload.edition_type || 'daily',
-      city_edition: payload.city_edition || 'चित्रकूट (मुख्य)',
+      city_edition: payload.city_edition || 'चित्रकूट',
       description: payload.description || '',
       pdf_storage_path: payload.pdf_storage_path || '',
       pdf_public_url: payload.pdf_public_url,

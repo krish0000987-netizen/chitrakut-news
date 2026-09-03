@@ -8,8 +8,8 @@ import { Upload, Trash2, Eye, Download, Star, Newspaper, CheckCircle2, Loader2, 
 export const EpaperManager: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक मुख्य संस्करण');
-  const [cityEdition, setCityEdition] = useState('चित्रकूट (मुख्य)');
+  const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक संस्करण');
+  const [cityEdition, setCityEdition] = useState('चित्रकूट');
   const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0, 10));
   const [pageCount, setPageCount] = useState(8);
   const [isFeatured, setIsFeatured] = useState(true);
@@ -128,7 +128,7 @@ export const EpaperManager: React.FC = () => {
               onChange={e => setCityEdition(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none font-devanagari"
             >
-              <option value="चित्रकूट (मुख्य)">चित्रकूट (मुख्य)</option>
+              <option value="चित्रकूट">चित्रकूट</option>
               <option value="भोपाल">भोपाल</option>
               <option value="सतना">सतना</option>
               <option value="रीवा">रीवा</option>
