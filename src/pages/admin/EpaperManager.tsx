@@ -11,7 +11,7 @@ export const EpaperManager: React.FC = () => {
   const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक मुख्य संस्करण');
   const [cityEdition, setCityEdition] = useState('चित्रकूट (मुख्य)');
   const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0, 10));
-  const [pageCount, setPageCount] = useState(6);
+  const [pageCount, setPageCount] = useState(8);
   const [isFeatured, setIsFeatured] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [extractingThumbnail, setExtractingThumbnail] = useState(false);
@@ -290,7 +290,7 @@ export const EpaperManager: React.FC = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-neutral-600 font-mono mt-0.5">
-                      <span>कुल {e.page_count || 4} पेज</span>
+                      <span>कुल {e.page_count || 8} पेज</span>
                       <span>• {e.pdf_storage_path?.slice(0, 30)}...</span>
                     </div>
                   </td>

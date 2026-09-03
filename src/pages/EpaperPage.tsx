@@ -247,7 +247,7 @@ export const EpaperPage: React.FC = () => {
                       )}
                       <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-slate-700 flex items-center gap-1">
                         <Layers className="w-3.5 h-3.5 text-neutral-500" />
-                        <span>{featured.page_count || 6} पेज</span>
+                        <span>{featured.page_count || 8} पेज</span>
                       </span>
                       {featured.file_size && (
                         <span className="bg-neutral-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-slate-700 font-mono">
@@ -352,7 +352,7 @@ export const EpaperPage: React.FC = () => {
                             {item.title}
                           </h4>
                           <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium font-devanagari mt-1">
-                            <span>कुल {item.page_count || 4} पेज</span>
+                            <span>कुल {item.page_count || 8} पेज</span>
                             {item.file_size && (
                               <span>• {(item.file_size / 1024 / 1024).toFixed(1)} MB</span>
                             )}

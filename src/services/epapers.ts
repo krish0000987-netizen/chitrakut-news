@@ -50,7 +50,7 @@ const SEED_EPAPERS: DbEpaper[] = [
     pdf_storage_path: 'sample-chitrakoot.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
     file_size: 4250000,
-    page_count: 4,
+    page_count: 8,
     language: 'hi',
     status: 'published',
     is_featured: true,
@@ -70,7 +70,7 @@ const SEED_EPAPERS: DbEpaper[] = [
     pdf_storage_path: 'sample-bhopal.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
     file_size: 3840000,
-    page_count: 4,
+    page_count: 8,
     language: 'hi',
     status: 'published',
     is_featured: false,
@@ -90,7 +90,7 @@ const SEED_EPAPERS: DbEpaper[] = [
     pdf_storage_path: 'sample-satna.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
     file_size: 3120000,
-    page_count: 4,
+    page_count: 8,
     language: 'hi',
     status: 'published',
     is_featured: false,
@@ -110,7 +110,7 @@ const SEED_EPAPERS: DbEpaper[] = [
     pdf_storage_path: 'sample-rewa.pdf',
     pdf_public_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
     file_size: 3400000,
-    page_count: 4,
+    page_count: 8,
     language: 'hi',
     status: 'published',
     is_featured: false,
@@ -128,6 +128,9 @@ function sanitizeItem(item: DbEpaper): DbEpaper {
   if (item.page_images) {
     item.page_images = item.page_images.filter(img => !img.includes('unsplash.com'));
     if (item.page_images.length === 0) delete item.page_images;
+  }
+  if (!item.page_count || item.page_count === 4 || item.page_count === 6) {
+    item.page_count = 8;
   }
   return item;
 }
@@ -239,7 +242,7 @@ export const epapersService = {
       cover_public_url: payload.cover_public_url,
       page_images: payload.page_images || (payload.cover_public_url ? [payload.cover_public_url] : []),
       file_size: payload.file_size,
-      page_count: payload.page_count || 4,
+      page_count: payload.page_count || 8,
       language: payload.language || 'hi',
       status: payload.status || 'published',
       is_featured: !!payload.is_featured,

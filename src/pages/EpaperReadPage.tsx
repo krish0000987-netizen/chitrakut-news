@@ -83,7 +83,7 @@ export const EpaperReadPage: React.FC = () => {
   }, [id]);
 
   const pdfUrl = epaper?.pdf_public_url;
-  const totalPages = epaper?.page_count || 4;
+  const totalPages = epaper?.page_count || 8;
   const pagesList = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   // Dynamically extract the real page image from PDF whenever currentPage changes
