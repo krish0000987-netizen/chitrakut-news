@@ -46,10 +46,10 @@ export const BhavishyaPage: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'bhavishyavani', label: 'भविष्यवाणी', short: 'भविष्यवाणी' },
     { id: 'rashifal', label: 'दैनिक राशिफल', short: 'राशिफल' },
     { id: 'panchang', label: 'दैनिक पंचांग', short: 'पंचांग' },
     { id: 'vrat-tyohar', label: 'व्रत-त्यौहार', short: 'व्रत-त्यौहार' },
+    { id: 'bhavishyavani', label: 'भविष्यवाणी', short: 'भविष्यवाणी' },
   ];
 
   const currentTab = tabs.find(t => t.id === active) || tabs[1];

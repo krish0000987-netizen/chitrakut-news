@@ -45,16 +45,17 @@ export const HomePage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h2 className={`${isEn?'':'font-devanagari'} font-black text-base sm:text-lg text-[#8B0000] flex items-center gap-2`}><Sparkles className="w-5 h-5 text-amber-600" /> {t.home.bhavishyaTitle}</h2>
           <div className={`flex gap-1.5 text-xs font-bold ${isEn?'':'font-devanagari'}`}>
-            <Link to="/bhavishya/rashifal" className="bg-white border px-3 py-1 rounded-full hover:bg-amber-100">{t.nav.rashifal}</Link>
+            <Link to="/bhavishya/rashifal" className="bg-[#8B0000] text-white px-3 py-1 rounded-full">{t.nav.rashifal}</Link>
             <Link to="/bhavishya/panchang" className="bg-white border px-3 py-1 rounded-full hover:bg-amber-100">{t.nav.panchang}</Link>
-            <Link to="/bhavishya/vrat-tyohar" className="bg-[#8B0000] text-white px-3 py-1 rounded-full">{t.nav.vrat}</Link>
+            <Link to="/bhavishya/vrat-tyohar" className="bg-white border px-3 py-1 rounded-full hover:bg-amber-100">{t.nav.vrat}</Link>
+            <Link to="/bhavishya/bhavishyavani" className="bg-white border px-3 py-1 rounded-full hover:bg-amber-100">{t.nav.bhavishyavani}</Link>
           </div>
         </div>
         <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs ${isEn?'':'font-devanagari'}`}>
           <Link to="/bhavishya/rashifal" className="bg-white dark:bg-slate-800 p-3 rounded-lg border text-center hover:shadow"><p className="text-lg">♈</p><p className="font-bold">{t.nav.rashifal}</p><p className="text-[11px] text-slate-500">{isEn?'12 zodiac signs':'12 राशियों का फल'}</p></Link>
           <Link to="/bhavishya/panchang" className="bg-white dark:bg-slate-800 p-3 rounded-lg border text-center hover:shadow"><p className="text-lg">📅</p><p className="font-bold">{t.nav.panchang}</p><p className="text-[11px] text-slate-500">{isEn?'Tithi • Muhurat':'तिथि • मुहूर्त'}</p></Link>
-          <Link to="/bhavishya/bhavishyavani" className="bg-white dark:bg-slate-800 p-3 rounded-lg border text-center hover:shadow"><p className="text-lg">🔮</p><p className="font-bold">{t.nav.bhavishyavani}</p><p className="text-[11px] text-slate-500">{isEn?'Weekly':'साप्ताहिक'}</p></Link>
           <Link to="/bhavishya/vrat-tyohar" className="bg-white dark:bg-slate-800 p-3 rounded-lg border text-center hover:shadow"><p className="text-lg">🪔</p><p className="font-bold">{t.nav.vrat}</p><p className="text-[11px] text-slate-500">{isEn?'Upcoming':'आगामी पर्व'}</p></Link>
+          <Link to="/bhavishya/bhavishyavani" className="bg-white dark:bg-slate-800 p-3 rounded-lg border text-center hover:shadow"><p className="text-lg">🔮</p><p className="font-bold">{t.nav.bhavishyavani}</p><p className="text-[11px] text-slate-500">{isEn?'Weekly':'साप्ताहिक'}</p></Link>
         </div>
       </section>
 

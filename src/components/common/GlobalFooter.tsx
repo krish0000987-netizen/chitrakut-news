@@ -73,10 +73,10 @@ export const GlobalFooter: React.FC = () => {
           <div>
             <h4 className={`font-bold text-sm uppercase tracking-wider text-amber-400 mb-3 border-b border-white/10 pb-1 ${isEn?'':'font-devanagari'}`}>{t.nav.bhavishya} ✨</h4>
             <ul className={`space-y-1.5 text-slate-300 ${isEn?'':'font-devanagari'}`}>
-              <li><Link to="/bhavishya/bhavishyavani" className="hover:text-white">{t.nav.bhavishyavani}</Link></li>
               <li><Link to="/bhavishya/rashifal" className="hover:text-white">{t.nav.rashifal}</Link></li>
               <li><Link to="/bhavishya/panchang" className="hover:text-white">{t.nav.panchang}</Link></li>
               <li><Link to="/bhavishya/vrat-tyohar" className="hover:text-white">{t.nav.vrat}</Link></li>
+              <li><Link to="/bhavishya/bhavishyavani" className="hover:text-white">{t.nav.bhavishyavani}</Link></li>
             </ul>
           </div>
           <div>

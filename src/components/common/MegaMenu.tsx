@@ -50,10 +50,10 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           <div>
             <h4 className="font-devanagari font-bold text-xs uppercase tracking-wider text-[#8B0000] mb-3 border-b border-red-200 pb-1 flex items-center gap-1"><Sparkles className="w-3 h-3" /> भविष्य जिज्ञासा</h4>
             <ul className="space-y-2 text-sm font-devanagari">
-              <li><Link to="/bhavishya/bhavishyavani" onClick={onClose} className="hover:text-[#8B0000]">भविष्यवाणी</Link></li>
               <li><Link to="/bhavishya/rashifal" onClick={onClose} className="hover:text-[#8B0000]">दैनिक राशिफल</Link></li>
               <li><Link to="/bhavishya/panchang" onClick={onClose} className="hover:text-[#8B0000]">दैनिक पंचांग</Link></li>
               <li><Link to="/bhavishya/vrat-tyohar" onClick={onClose} className="hover:text-[#8B0000]">व्रत-त्यौहार</Link></li>
+              <li><Link to="/bhavishya/bhavishyavani" onClick={onClose} className="hover:text-[#8B0000]">भविष्यवाणी</Link></li>
               <li className="pt-2 border-t"><Link to="/epaper" onClick={onClose} className="font-bold text-[#8B0000]">📰 ई-पेपर</Link></li>
               <li><Link to="/videos" onClick={onClose} className="hover:text-[#8B0000]">वीडियो</Link></li>
               <li><Link to="/photos" onClick={onClose} className="hover:text-[#8B0000]">फोटो गैलरी</Link></li>

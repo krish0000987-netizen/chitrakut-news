@@ -58,10 +58,10 @@ export const GlobalHeader: React.FC = () => {
   ];
 
   const bhavishyaItems = [
-    { name: 'भविष्यवाणी (Predictions)', path: '/bhavishya/bhavishyavani', icon: '🔮' },
     { name: 'दैनिक राशिफल (Horoscope)', path: '/bhavishya/rashifal', icon: '♈' },
     { name: 'दैनिक पंचांग (Panchang)', path: '/bhavishya/panchang', icon: '📅' },
     { name: 'व्रत-त्यौहार (Festivals)', path: '/bhavishya/vrat-tyohar', icon: '🪔' },
+    { name: 'भविष्यवाणी (Predictions)', path: '/bhavishya/bhavishyavani', icon: '🔮' },
   ];
 
   return (
