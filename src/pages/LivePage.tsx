@@ -62,7 +62,7 @@ export const LivePage: React.FC = () => {
         </div>
 
         <div className="mt-3 flex items-center justify-between text-[11px] text-red-300 font-mono">
-          <span>Live Editor in Charge: New Delhi Central Bureau</span>
+          <span>Live Editor in Charge: Chitrakoot Jyoti Central Desk</span>
           <span>Last Feed Sync: {lastRefreshed}</span>
         </div>
       </div>

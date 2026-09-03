@@ -23,7 +23,7 @@ export const HeroNewsroom: React.FC = () => {
           </h2>
         </div>
         <span className="text-xs font-mono font-semibold text-slate-500 uppercase hidden sm:inline">
-          NEW DELHI BUREAU EDITION
+          दैनिक डिजिटल संस्करण
         </span>
       </div>
 

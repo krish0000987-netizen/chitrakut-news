@@ -441,7 +441,7 @@ export const ArticlePage: React.FC = () => {
               Read Today’s Printed Newspaper
             </h4>
             <p className="text-xs text-slate-300 mt-1">
-              Access the exact replica of New Delhi & Mumbai print editions on your phone or tablet.
+              Access the exact replica of Chitrakoot Jyoti print editions on your phone or tablet.
             </p>
             <Link
               to="/epaper"
