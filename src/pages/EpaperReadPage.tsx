@@ -7,6 +7,8 @@ import {
   ChevronRight, MapPin, Check, X, Copy, Sparkles, Layers
 } from 'lucide-react';
 import { epapersService, DbEpaper, CITIES_EDITIONS } from '../services/epapers';
+import { renderPdfPageToCanvas, generatePdfThumbnail } from '../lib/pdfHelper';
+import { EpaperThumbnail } from '../components/epaper/EpaperThumbnail';
 
 export const EpaperReadPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +18,8 @@ export const EpaperReadPage: React.FC = () => {
   const [epaper, setEpaper] = useState<DbEpaper | null>(null);
   const [allEpapers, setAllEpapers] = useState<DbEpaper[]>([]);
   const [loading, setLoading] = useState(true);
+  const [renderingPdf, setRenderingPdf] = useState(false);
+  const [pdfRenderError, setPdfRenderError] = useState(false);
 
   // Reader Controls
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -38,6 +42,33 @@ export const EpaperReadPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pageImageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Render PDF page to canvas
+  useEffect(() => {
+    if (!epaper?.pdf_public_url || !canvasRef.current) return;
+    let isCancelled = false;
+
+    setRenderingPdf(true);
+    setPdfRenderError(false);
+
+    renderPdfPageToCanvas(epaper.pdf_public_url, currentPage, canvasRef.current, 1.8)
+      .then(({ numPages }) => {
+        if (!isCancelled) {
+          setRenderingPdf(false);
+        }
+      })
+      .catch((err) => {
+        console.warn('PDF render error:', err);
+        if (!isCancelled) {
+          setRenderingPdf(false);
+          setPdfRenderError(true);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [epaper?.pdf_public_url, currentPage]);
 
   // Load E-Papers
   useEffect(() => {
@@ -469,16 +500,41 @@ export const EpaperReadPage: React.FC = () => {
               cursor: isCropMode ? 'crosshair' : zoom > 100 ? (isDragging ? 'grabbing' : 'grab') : 'default'
             }}
           >
-            {/* Newspaper Page Image */}
+            {/* Newspaper Page Container */}
             <div className="relative shadow-2xl bg-white border border-neutral-600 rounded-xs overflow-hidden max-h-[82vh] max-w-[92vw] flex items-center justify-center">
-              <img
-                ref={pageImageRef}
-                src={currentImageUrl}
-                alt={`${epaper.title} - पेज ${currentPage}`}
-                crossOrigin="anonymous"
-                className="max-h-[82vh] w-auto object-contain block pointer-events-none"
-                draggable={false}
-              />
+              
+              {/* PDF Canvas Renderer */}
+              {epaper.pdf_public_url && !pdfRenderError ? (
+                <div className="relative">
+                  <canvas
+                    ref={canvasRef}
+                    className="max-h-[82vh] w-auto object-contain block pointer-events-none"
+                  />
+                  {renderingPdf && (
+                    <div className="absolute inset-0 bg-neutral-900/40 backdrop-blur-xs flex items-center justify-center">
+                      <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                    </div>
+                  )}
+                  {/* Hidden img copy for crop calculations */}
+                  <img
+                    ref={pageImageRef}
+                    src={currentImageUrl}
+                    alt=""
+                    className="hidden"
+                    crossOrigin="anonymous"
+                  />
+                </div>
+              ) : (
+                /* High-Res Image Renderer */
+                <img
+                  ref={pageImageRef}
+                  src={currentImageUrl}
+                  alt={`${epaper.title} - पेज ${currentPage}`}
+                  crossOrigin="anonymous"
+                  className="max-h-[82vh] w-auto object-contain block pointer-events-none"
+                  draggable={false}
+                />
+              )}
 
               {/* Crop Box Selection Overlay */}
               {isCropMode && cropBox && (

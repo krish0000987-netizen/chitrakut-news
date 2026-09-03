@@ -1,71 +1,122 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { epapersService } from '../../services/epapers';
-import { Upload, Trash2, Eye, Download, Star, Newspaper, CheckCircle2 } from 'lucide-react';
+import { generatePdfThumbnail } from '../../lib/pdfHelper';
+import { EpaperThumbnail } from '../../components/epaper/EpaperThumbnail';
+import { Upload, Trash2, Eye, Download, Star, Newspaper, CheckCircle2, Loader2, Image as ImageIcon } from 'lucide-react';
 
 export const EpaperManager: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState('चित्रकूट ज्योति – दैनिक मुख्य संस्करण');
   const [cityEdition, setCityEdition] = useState('चित्रकूट (मुख्य)');
-  const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0,10));
+  const [editionDate, setEditionDate] = useState(new Date().toISOString().slice(0, 10));
   const [pageCount, setPageCount] = useState(6);
   const [isFeatured, setIsFeatured] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [extractingThumbnail, setExtractingThumbnail] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [autoCoverUrl, setAutoCoverUrl] = useState<string | null>(null);
 
-  const fetch = async ()=>{ setLoading(true); try{ const r=await epapersService.list(); setList(r); }catch{} setLoading(false); };
-  useEffect(()=>{ fetch(); },[]);
+  const fetch = async () => {
+    setLoading(true);
+    try {
+      const r = await epapersService.list();
+      setList(r);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => {
+    fetch();
+  }, []);
 
-  const onCreate = async ()=>{
-    if(!pdfFile) return alert('कृपया ई-पेपर की PDF फाइल चुनें');
+  const handlePdfChange = async (file: File | null) => {
+    setPdfFile(file);
+    setAutoCoverUrl(null);
+    if (!file) return;
+
+    setExtractingThumbnail(true);
+    try {
+      // Auto-extract page 1 as high-res thumbnail & calculate page count
+      const { dataUrl, blob, numPages } = await generatePdfThumbnail(file, 1, 800);
+      setAutoCoverUrl(dataUrl);
+      setPageCount(numPages);
+
+      // Create cover file from blob if user hasn't selected a manual cover
+      if (!coverFile) {
+        const generatedCoverFile = new File(
+          [blob],
+          `${file.name.replace(/\.[^/.]+$/, '')}-page-1.jpg`,
+          { type: 'image/jpeg' }
+        );
+        setCoverFile(generatedCoverFile);
+      }
+    } catch (err) {
+      console.warn('Auto PDF thumbnail extraction error:', err);
+    }
+    setExtractingThumbnail(false);
+  };
+
+  const onCreate = async () => {
+    if (!pdfFile) return alert('कृपया ई-पेपर की PDF फाइल चुनें');
     setUploading(true);
-    try{
+    try {
       const up = await epapersService.uploadPdf(pdfFile, coverFile || undefined);
       await epapersService.create({
-        title, 
-        edition_date: editionDate, 
-        edition_type:'daily', 
+        title,
+        edition_date: editionDate,
+        edition_type: 'daily',
         city_edition: cityEdition,
         page_count: Number(pageCount),
-        pdf_storage_path: up.pdfPath, 
+        pdf_storage_path: up.pdfPath,
         pdf_public_url: up.pdfUrl,
-        cover_image_path: up.coverPath, 
-        cover_public_url: up.coverUrl, 
-        file_size: up.fileSize, 
-        status:'published', 
-        is_featured:isFeatured, 
-        language:'hi', 
+        cover_image_path: up.coverPath,
+        cover_public_url: up.coverUrl || autoCoverUrl || undefined,
+        page_images: up.coverUrl ? [up.coverUrl] : autoCoverUrl ? [autoCoverUrl] : [],
+        file_size: up.fileSize,
+        status: 'published',
+        is_featured: isFeatured,
+        language: 'hi',
         published_at: new Date().toISOString()
       } as any);
-      setPdfFile(null); setCoverFile(null);
-      alert('ई-पेपर सफलतापूर्वक प्रकाशित हो गया है ✓');
+
+      setPdfFile(null);
+      setCoverFile(null);
+      setAutoCoverUrl(null);
+      alert('ई-पेपर और पेज 1 प्रीव्यू सफलतापूर्वक प्रकाशित हो गया है ✓');
       fetch();
-    } catch(e:any){ alert(e.message); }
+    } catch (e: any) {
+      alert(e.message);
+    }
     setUploading(false);
   };
 
-  const toggleFeatured = async (id:string, cur:boolean)=>{
+  const toggleFeatured = async (id: string, cur: boolean) => {
     await epapersService.update(id, { is_featured: !cur } as any);
     fetch();
   };
-  const remove = async (id:string)=>{ if(!confirm('क्या आप वाकई इस ई-पेपर को हटाना चाहते हैं?')) return; await epapersService.remove(id); fetch(); };
+
+  const remove = async (id: string) => {
+    if (!confirm('क्या आप वाकई इस ई-पेपर को हटाना चाहते हैं?')) return;
+    await epapersService.remove(id);
+    fetch();
+  };
 
   return (
     <div className="space-y-6">
-      {/* Upload Form - Solid Black & White */}
+      {/* Upload Form */}
       <div className="bg-white rounded-2xl border-2 border-black p-5 shadow-sm">
         <h3 className="font-black text-base text-black mb-3 pb-2 border-b border-neutral-200 flex items-center gap-2 font-devanagari">
           <Newspaper className="w-5 h-5 text-black" /> नया ई-पेपर संस्करण अपलोड एवं प्रकाशित करें
         </h3>
-        
+
         <div className="grid md:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-bold text-black mb-1 font-devanagari">संस्करण का नाम / शीर्षक *</label>
             <input
               value={title}
-              onChange={e=>setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder="उदा. चित्रकूट ज्योति - भोपाल मुख्य संस्करण"
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none"
             />
@@ -74,7 +125,7 @@ export const EpaperManager: React.FC = () => {
             <label className="block text-xs font-bold text-black mb-1 font-devanagari">शहर / क्षेत्रीय संस्करण (City)</label>
             <select
               value={cityEdition}
-              onChange={e=>setCityEdition(e.target.value)}
+              onChange={e => setCityEdition(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none font-devanagari"
             >
               <option value="चित्रकूट (मुख्य)">चित्रकूट (मुख्य)</option>
@@ -91,7 +142,7 @@ export const EpaperManager: React.FC = () => {
             <input
               type="date"
               value={editionDate}
-              onChange={e=>setEditionDate(e.target.value)}
+              onChange={e => setEditionDate(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none"
             />
           </div>
@@ -102,7 +153,7 @@ export const EpaperManager: React.FC = () => {
               min={1}
               max={64}
               value={pageCount}
-              onChange={e=>setPageCount(Number(e.target.value))}
+              onChange={e => setPageCount(Number(e.target.value))}
               className="w-full px-3 py-2 rounded-xl border-2 border-black bg-white text-black font-medium text-xs focus:outline-none font-mono"
             />
           </div>
@@ -113,56 +164,74 @@ export const EpaperManager: React.FC = () => {
             <input
               type="checkbox"
               checked={isFeatured}
-              onChange={e=>setIsFeatured(e.target.checked)}
+              onChange={e => setIsFeatured(e.target.checked)}
               className="w-4 h-4 rounded border-2 border-black accent-black cursor-pointer"
             />
             <span>होमपेज पर मुख्य ई-पेपर बनाएं (Featured Edition)</span>
           </label>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-3 mt-4">
-          <div className="p-3 bg-neutral-50 rounded-xl border-2 border-dashed border-black">
-            <label className="block text-xs font-black text-black mb-1 font-devanagari">
-              ई-पेपर PDF फाइल चुनें * (अनिवार्य)
-            </label>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={e=>setPdfFile(e.target.files?.[0]||null)}
-              className="w-full text-xs text-black border border-neutral-300 rounded-lg p-2 bg-white cursor-pointer"
-            />
-            {pdfFile && (
-              <p className="text-[11px] font-bold text-black mt-1.5 flex items-center gap-1 font-mono">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> {pdfFile.name} ({(pdfFile.size/1024/1024).toFixed(2)} MB)
+        {/* Upload boxes with Live Page 1 Preview */}
+        <div className="grid md:grid-cols-2 gap-4 mt-4">
+          <div className="p-3.5 bg-neutral-50 rounded-xl border-2 border-dashed border-black flex flex-col justify-between">
+            <div>
+              <label className="block text-xs font-black text-black mb-1 font-devanagari">
+                ई-पेपर PDF फाइल चुनें * (अनिवार्य)
+              </label>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={e => handlePdfChange(e.target.files?.[0] || null)}
+                className="w-full text-xs text-black border border-neutral-300 rounded-lg p-2 bg-white cursor-pointer"
+              />
+            </div>
+
+            {extractingThumbnail && (
+              <div className="mt-2 text-xs font-bold text-neutral-600 flex items-center gap-1.5 font-devanagari">
+                <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
+                <span>PDF से पहले पेज का प्रीव्यू तैयार किया जा रहा है...</span>
+              </div>
+            )}
+
+            {pdfFile && !extractingThumbnail && (
+              <p className="text-[11px] font-bold text-black mt-2 flex items-center gap-1 font-mono">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
           </div>
 
-          <div className="p-3 bg-neutral-50 rounded-xl border-2 border-dashed border-neutral-300">
-            <label className="block text-xs font-black text-black mb-1 font-devanagari">
-              कवर पेज फोटो (वैकल्पिक / Optional Image)
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={e=>setCoverFile(e.target.files?.[0]||null)}
-              className="w-full text-xs text-black border border-neutral-300 rounded-lg p-2 bg-white cursor-pointer"
-            />
-            {coverFile && (
-              <p className="text-[11px] font-bold text-black mt-1.5 flex items-center gap-1 font-mono">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> {coverFile.name}
+          {/* Page 1 Extracted Preview Display */}
+          <div className="p-3.5 bg-neutral-50 rounded-xl border-2 border-dashed border-neutral-300 flex items-center gap-4">
+            <div className="w-20 h-28 shrink-0 rounded-lg overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shadow-xs">
+              {extractingThumbnail ? (
+                <Loader2 className="w-6 h-6 text-neutral-400 animate-spin" />
+              ) : autoCoverUrl ? (
+                <img src={autoCoverUrl} alt="Page 1 Preview" className="w-full h-full object-cover" />
+              ) : (
+                <ImageIcon className="w-8 h-8 text-neutral-300" />
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-xs font-black text-black font-devanagari block">
+                पेज 1 ऑटो-प्रीव्यू (First Page Cover)
+              </span>
+              <p className="text-[11px] text-neutral-600 font-devanagari">
+                {autoCoverUrl
+                  ? '✓ PDF से पहले पेज की फोटो अपने आप बन गई है। अलग से फोटो डालने की जरूरत नहीं है।'
+                  : 'PDF फाइल चुनते ही पहले पेज का प्रीव्यू यहाँ अपने आप तैयार हो जाएगा।'}
               </p>
-            )}
+            </div>
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
           <button
             onClick={onCreate}
-            disabled={uploading || !pdfFile}
+            disabled={uploading || !pdfFile || extractingThumbnail}
             className="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white rounded-xl text-xs font-black disabled:opacity-40 flex items-center gap-1.5 shadow transition-colors font-devanagari"
           >
-            <Upload className="w-4 h-4" /> {uploading ? 'अपलोड किया जा रहा है...' : 'ई-पेपर अपलोड एवं प्रकाशित करें'}
+            <Upload className="w-4 h-4" /> {uploading ? 'अपलोड एवं प्रकाशित हो रहा है...' : 'ई-पेपर अपलोड एवं प्रकाशित करें'}
           </button>
           <span className="text-[11px] text-neutral-600 font-medium">
             प्रकाशन के तुरंत बाद पाठक <span className="font-mono text-black font-bold">/epaper</span> पर पढ़ सकेंगे।
@@ -189,7 +258,7 @@ export const EpaperManager: React.FC = () => {
           <table className="w-full text-xs">
             <thead className="bg-neutral-100 text-[11px] uppercase font-black text-black border-b-2 border-black">
               <tr>
-                <th className="p-3 text-left font-devanagari">कवर फोटो</th>
+                <th className="p-3 text-left font-devanagari">पेज 1 प्रीव्यू</th>
                 <th className="p-3 text-left font-devanagari">संस्करण एवं विवरण</th>
                 <th className="p-3 text-center font-devanagari">तारीख</th>
                 <th className="p-3 text-center font-devanagari">स्थिति</th>
@@ -201,11 +270,15 @@ export const EpaperManager: React.FC = () => {
               {list.map(e => (
                 <tr key={e.id} className="hover:bg-neutral-50 transition-colors">
                   <td className="p-3">
-                    <img
-                      src={e.cover_public_url || '/assets/logo.jpg'}
-                      alt=""
-                      className="w-12 h-16 object-cover rounded border-2 border-black shadow-xs bg-white"
-                    />
+                    <div className="w-12 h-16 rounded border-2 border-black shadow-xs overflow-hidden bg-white">
+                      <EpaperThumbnail
+                        coverUrl={e.cover_public_url}
+                        pdfUrl={e.pdf_public_url}
+                        title={e.title}
+                        editionDate={e.edition_date}
+                        cityEdition={e.city_edition}
+                      />
+                    </div>
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-1.5">
@@ -274,3 +347,4 @@ export const EpaperManager: React.FC = () => {
     </div>
   );
 };
+

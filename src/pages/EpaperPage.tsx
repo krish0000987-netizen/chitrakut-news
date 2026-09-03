@@ -6,6 +6,7 @@ import {
   RefreshCw, MapPin, Sparkles, Filter, ChevronRight, Layers
 } from 'lucide-react';
 import { epapersService, DbEpaper, CITIES_EDITIONS } from '../services/epapers';
+import { EpaperThumbnail } from '../components/epaper/EpaperThumbnail';
 
 export const EpaperPage: React.FC = () => {
   const [epapers, setEpapers] = useState<DbEpaper[]>([]);
@@ -196,20 +197,14 @@ export const EpaperPage: React.FC = () => {
                       to={`/epaper/read/${featured.id}`}
                       className="block group relative rounded-2xl overflow-hidden border-2 border-neutral-300 dark:border-slate-700 shadow-md bg-neutral-100 dark:bg-slate-800 aspect-[3/4.2]"
                     >
-                      {featured.cover_public_url ? (
-                        <img
-                          src={featured.cover_public_url}
-                          alt={featured.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                          <FileText className="w-16 h-16 text-neutral-400 mb-2 group-hover:scale-110 transition-transform" />
-                          <span className="font-black text-xs font-devanagari text-neutral-700 dark:text-neutral-300">
-                            {featured.title}
-                          </span>
-                        </div>
-                      )}
+                      <EpaperThumbnail
+                        coverUrl={featured.cover_public_url}
+                        pdfUrl={featured.pdf_public_url}
+                        title={featured.title}
+                        editionDate={featured.edition_date}
+                        cityEdition={featured.city_edition}
+                        imgClassName="group-hover:scale-105 transition-transform duration-500"
+                      />
 
                       {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -334,18 +329,14 @@ export const EpaperPage: React.FC = () => {
                           to={`/epaper/read/${item.id}`}
                           className="w-full aspect-[3/4] bg-neutral-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-neutral-200 dark:border-slate-700 flex items-center justify-center relative block"
                         >
-                          {item.cover_public_url ? (
-                            <img
-                              src={item.cover_public_url}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="text-center p-3">
-                              <FileText className="w-12 h-12 text-neutral-400 mx-auto mb-1" />
-                              <p className="text-[10px] font-mono text-neutral-500">{item.edition_date}</p>
-                            </div>
-                          )}
+                          <EpaperThumbnail
+                            coverUrl={item.cover_public_url}
+                            pdfUrl={item.pdf_public_url}
+                            title={item.title}
+                            editionDate={item.edition_date}
+                            cityEdition={item.city_edition}
+                            imgClassName="group-hover:scale-105 transition-transform duration-300"
+                          />
 
                           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span className="bg-red-600 text-white text-[11px] font-black px-3 py-1.5 rounded-lg shadow font-devanagari flex items-center gap-1">
