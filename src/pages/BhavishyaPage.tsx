@@ -52,7 +52,7 @@ export const BhavishyaPage: React.FC = () => {
     { id: 'bhavishyavani', label: 'भविष्यवाणी', short: 'भविष्यवाणी' },
   ];
 
-  const currentTab = tabs.find(t => t.id === active) || tabs[1];
+  const currentTab = tabs.find(t => t.id === active) || tabs[0];
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
